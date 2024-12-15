@@ -19,17 +19,17 @@ router.post('/create', createVisitor);
 router.use(protect);
 
 router.route('/')
-    .get(authorize('editor', 'admin'), getAllVisitors);
+    .get(authorize('editor', 'admin', 'administrator'), getAllVisitors);
 
 router.route('/stats')
-    .get(authorize('admin'), getVisitorStats);
+    .get(authorize('admin', 'administrator'), getVisitorStats);
 
 router.route('/:id')
-    .get(authorize('editor', 'admin'), getVisitorById)
-    .put(authorize('editor', 'admin'), updateVisitor)
-    .delete(authorize('admin'), deleteVisitor);
+    .get(authorize('editor', 'admin', 'administrator'), getVisitorById)
+    .put(authorize('editor', 'admin', 'administrator'), updateVisitor)
+    .delete(authorize('admin', 'administrator'), deleteVisitor);
 
 router.route('/bulk')
-    .post(authorize('admin'), bulkCreateVisitors);
+    .post(authorize('admin', 'administrator'), bulkCreateVisitors);
 
 export default router;

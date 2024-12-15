@@ -1,5 +1,5 @@
-import { News } from "../models/news.model";
-import { asyncHandler } from "../utils/asyncHandler";
+import { News } from "../models/news.model.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
 
 // Create News
 export const createNews = asyncHandler(async (req, res) => {

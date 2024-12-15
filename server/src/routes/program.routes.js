@@ -6,12 +6,15 @@ import {
     updateProgram, 
     deleteProgram 
 } from '../controllers/program.controller.js';
-import { authorizeRoles } from '../middleware/authorizeRoles.js';
+import { protect, authorize } from '../middleware/auth.middleware.js';
 
 const router = express.Router();
 
+// Protected routes
+router.use(protect);
+
 // Create a new program (admin only)
-router.post('/programs', authorizeRoles('admin'), createProgram);
+router.post('/create', authorize('admin', 'administrator'), createProgram);
 
 // Get all programs
 router.get('/programs', getAllPrograms);
@@ -20,9 +23,9 @@ router.get('/programs', getAllPrograms);
 router.get('/programs/:id', getProgramById);
 
 // Update a program by ID (admin only)
-router.put('/programs/:id', authorizeRoles('admin'), updateProgram);
+router.put('/programs/:id', authorize('admin', 'administrator'), updateProgram);
 
 // Delete a program by ID (admin only)
-router.delete('/programs/:id', authorizeRoles('admin'), deleteProgram);
+router.delete('/programs/:id', authorize('admin', 'administrator'), deleteProgram);
 
 export default router;

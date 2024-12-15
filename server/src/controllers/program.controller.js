@@ -1,5 +1,5 @@
-import { Program } from "../models/program.model";
-import { asyncHandler } from "../utils/asyncHandler";
+import { Program } from "../models/program.model.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
 
 export const createProgram = asyncHandler(async (req, res) => {
     const programData = req.body;

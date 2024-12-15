@@ -6,12 +6,9 @@ import {
     updateCourse, 
     deleteCourse 
 } from '../controllers/course.controller.js';
-import { authorizeRoles } from '../middleware/authorizeRoles.js';
+import { protect, authorize } from '../middleware/auth.middleware.js';
 
 const router = express.Router();
-
-// Create a new course (admin only)
-router.post('/courses', authorizeRoles('admin'), createCourse);
 
 // Get all courses
 router.get('/courses', getAllCourses);
@@ -19,10 +16,17 @@ router.get('/courses', getAllCourses);
 // Get a course by ID
 router.get('/courses/:id', getCourseById);
 
+// Protected routes
+router.use(protect);
+
+
+// Create a new course (admin only)
+router.post('/create', authorize('admin', 'administrator'), createCourse);
+
 // Update a course by ID (admin only)
-router.put('/courses/:id', authorizeRoles('admin'), updateCourse);
+router.put('/courses/:id', authorize('admin', 'administrator'), updateCourse);
 
 // Delete a course by ID (admin only)
-router.delete('/courses/:id', authorizeRoles('admin'), deleteCourse);
+router.delete('/courses/:id', authorize('admin', 'administrator'), deleteCourse);
 
 export default router;

@@ -1,5 +1,5 @@
-import { Degree } from "../models/degree.model";
-import { asyncHandler } from "../utils/asyncHandler";
+import { Degree } from "../models/degree.model.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
 
 
 export const createDegree = asyncHandler(async (req, res) => {

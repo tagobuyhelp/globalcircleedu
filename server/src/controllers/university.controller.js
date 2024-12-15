@@ -1,5 +1,5 @@
-import { University } from "../models/university.model";
-import { asyncHandler } from "../utils/asyncHandler";
+import { University } from "../models/university.model.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
 
 export const createUniversity = asyncHandler(async (req, res) => {
     const universityData = req.body;

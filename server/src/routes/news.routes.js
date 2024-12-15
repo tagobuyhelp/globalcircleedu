@@ -6,12 +6,15 @@ import {
     updateNews, 
     deleteNews 
 } from '../controllers/news.controller.js';
-import { authorizeRoles } from '../middleware/authorizeRoles.js';
+import { protect, authorize } from '../middleware/auth.middleware.js';
 
 const router = express.Router();
 
+// Protected routes
+router.use(protect);
+
 // Create a new news (admin only)
-router.post('/news', authorizeRoles('admin'), createNews);
+router.post('/news', authorize('admin', 'administrator'), createNews);
 
 // Get all news
 router.get('/news', getAllNews);
@@ -20,9 +23,9 @@ router.get('/news', getAllNews);
 router.get('/news/:id', getNewsById);
 
 // Update a news by ID (admin only)
-router.put('/news/:id', authorizeRoles('admin'), updateNews);
+router.put('/news/:id', authorize('admin', 'administrator'), updateNews);
 
 // Delete a news by ID (admin only)
-router.delete('/news/:id', authorizeRoles('admin'), deleteNews);
+router.delete('/news/:id', authorize('admin', 'administrator'), deleteNews);
 
 export default router;

@@ -6,12 +6,12 @@ import {
     updateUniversity, 
     deleteUniversity 
 } from '../controllers/university.controller.js';
-import { authorizeRoles } from '../middleware/authorizeRoles.js';
+import { authorize } from '../middleware/auth.middleware.js';
 
 const router = express.Router();
 
 // Create a new university (admin only)
-router.post('/universities', authorizeRoles('admin'), createUniversity);
+router.post('/universities', authorize('admin', 'administrator'), createUniversity);
 
 // Get all universities
 router.get('/universities', getAllUniversities);
@@ -20,9 +20,9 @@ router.get('/universities', getAllUniversities);
 router.get('/universities/:id', getUniversityById);
 
 // Update a university by ID (admin only)
-router.put('/universities/:id', authorizeRoles('admin'), updateUniversity);
+router.put('/universities/:id', authorize('admin', 'administrator'), updateUniversity);
 
 // Delete a university by ID (admin only)
-router.delete('/universities/:id', authorizeRoles('admin'), deleteUniversity);
+router.delete('/universities/:id', authorize('admin', 'administrator'), deleteUniversity);
 
 export default router;

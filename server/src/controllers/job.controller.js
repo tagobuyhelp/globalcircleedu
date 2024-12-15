@@ -1,5 +1,5 @@
-import { Job } from "../models/job.model";
-import { asyncHandler } from "../utils/asyncHandler";
+import { Job } from "../models/job.model.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
 
 // Create Job
 export const createJob = asyncHandler(async (req, res) => {

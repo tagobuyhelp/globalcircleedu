@@ -35,10 +35,24 @@ app.get('/', (req, res) => {
 // Import routes
 import userRouter from './routes/user.routes.js';
 import authRouter from './routes/auth.routes.js';
+import visitorRouter from './routes/visitor.routes.js';
+import courseRouter from './routes/course.routes.js';;
+import universityRouter from './routes/university.routes.js';
+import newsRouter from './routes/news.routes.js';
+import jobRouter from './routes/job.routes.js';
+import degreeRouter from './routes/degree.routes.js';
+import programRouter from './routes/program.routes.js';
 
 // Route declaration
 app.use("/users", userRouter);
 app.use("/auth", authRouter);
+app.use("/visitor", visitorRouter);
+app.use("/course", courseRouter);
+app.use("/university", universityRouter);
+app.use("/news", newsRouter);
+app.use("/job", jobRouter);
+app.use("/degree", degreeRouter);
+app.use("/program", programRouter);
 
 
 // Catch-all for unhandled routes
