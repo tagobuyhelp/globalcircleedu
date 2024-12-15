@@ -36,10 +36,10 @@ const UniversitySchema = new Schema({
         type: Number,
         min: 0,
     },
-    logo: {
+    logo: { 
         type: String,
-        required: true,
     },
+    campusPhotos: [String],
     courses: [{ 
         type: Types.ObjectId, 
         ref: 'Course',

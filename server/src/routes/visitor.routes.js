@@ -8,12 +8,14 @@ import {
     bulkCreateVisitors,
     getVisitorStats
 } from '../controllers/visitor.controller.js';
+import { uploadPhotos } from '../middleware/photoUpload.middleware.js';
 import { protect, authorize } from '../middleware/auth.middleware.js';
+
 
 const router = express.Router();
 
 // Public routes
-router.post('/create', createVisitor);
+router.post('/create', uploadPhotos, createVisitor);
 
 // Protected routes
 router.use(protect);

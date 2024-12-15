@@ -1,4 +1,6 @@
 import express from 'express';
+import { protect, authorize } from '../middleware/auth.middleware.js';
+import { uploadPhotos, getPhotoPath } from '../middleware/photoUpload.middleware.js';
 import { 
     createUniversity, 
     getAllUniversities, 
@@ -6,23 +8,19 @@ import {
     updateUniversity, 
     deleteUniversity 
 } from '../controllers/university.controller.js';
-import { authorize } from '../middleware/auth.middleware.js';
 
 const router = express.Router();
 
-// Create a new university (admin only)
-router.post('/universities', authorize('admin', 'administrator'), createUniversity);
+// Public routes
+router.get('/', getAllUniversities);
+router.get('/:id', getUniversityById);
 
-// Get all universities
-router.get('/universities', getAllUniversities);
+// Protected routes
+router.use(protect);
 
-// Get a university by ID
-router.get('/universities/:id', getUniversityById);
-
-// Update a university by ID (admin only)
-router.put('/universities/:id', authorize('admin', 'administrator'), updateUniversity);
-
-// Delete a university by ID (admin only)
-router.delete('/universities/:id', authorize('admin', 'administrator'), deleteUniversity);
+// Admin only routes
+router.post('/', authorize('admin', 'administrator'), uploadPhotos, createUniversity);
+router.put('/:id', authorize('admin', 'administrator'), uploadPhotos, updateUniversity);
+router.delete('/:id', authorize('admin', 'administrator'), deleteUniversity);
 
 export default router;
