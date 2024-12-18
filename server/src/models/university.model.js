@@ -7,6 +7,10 @@ const UniversitySchema = new Schema({
         trim: true,
         required: true,
     },
+    description: {
+        type: String,
+        trim: true,
+    },
     location: {
         type: String,
         trim: true,

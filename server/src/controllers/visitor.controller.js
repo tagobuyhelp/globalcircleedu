@@ -1,4 +1,8 @@
 import { Visitor } from "../models/visitor.model.js";
+import { University } from "../models/university.model.js";
+import { Course } from "../models/course.model.js"
+import { Job } from '../models/job.model.js';
+import { News } from '../models/news.model.js';
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/apiError.js";
 import { ApiResponse } from "../utils/apiResponse.js";
@@ -61,12 +65,12 @@ export const getAllVisitors = asyncHandler(async (req, res) => {
     const visitorsWithFullUrls = visitors.map(visitor => {
         const visitorObj = visitor.toObject();
         if (visitorObj.profilePicture) {
-            visitorObj.profilePicture = `${BASE_URL}${visitorObj.profilePicture}`;
+            visitorObj.profilePicture = `${BASE_URL}/${visitorObj.profilePicture}`;
         }
         if (visitorObj.documents) {
             Object.keys(visitorObj.documents).forEach(docType => {
                 if (visitorObj.documents[docType].fileURL) {
-                    visitorObj.documents[docType].fileURL = `${BASE_URL}${visitorObj.documents[docType].fileURL}`;
+                    visitorObj.documents[docType].fileURL = `${BASE_URL}/${visitorObj.documents[docType].fileURL}`;
                 }
             });
         }
@@ -94,13 +98,13 @@ export const getVisitorById = asyncHandler(async (req, res) => {
     const visitorObj = visitor.toObject();
 
     if (visitorObj.profilePicture) {
-        visitorObj.profilePicture = `${BASE_URL}${visitorObj.profilePicture}`;
+        visitorObj.profilePicture = `${BASE_URL}/${visitorObj.profilePicture}`;
     }
 
     if (visitorObj.documents) {
         Object.keys(visitorObj.documents).forEach(docType => {
             if (visitorObj.documents[docType].fileURL) {
-                visitorObj.documents[docType].fileURL = `${BASE_URL}${visitorObj.documents[docType].fileURL}`;
+                visitorObj.documents[docType].fileURL = `${BASE_URL}/${visitorObj.documents[docType].fileURL}`;
             }
         });
     }
@@ -156,7 +160,7 @@ export const updateVisitor = asyncHandler(async (req, res) => {
     if (visitorObj.documents) {
         Object.keys(visitorObj.documents).forEach(docType => {
             if (visitorObj.documents[docType].fileURL) {
-                visitorObj.documents[docType].fileURL = `${BASE_URL}${visitorObj.documents[docType].fileURL}`;
+                visitorObj.documents[docType].fileURL = `${BASE_URL}/${visitorObj.documents[docType].fileURL}`;
             }
         });
     }
@@ -184,18 +188,148 @@ export const bulkCreateVisitors = asyncHandler(async (req, res) => {
     res.status(201).json(new ApiResponse(201, visitors, "Visitors created successfully"));
 });
 
+
 // Get visitor statistics
+
+// Get advanced visitor statistics
 export const getVisitorStats = asyncHandler(async (req, res) => {
-    const stats = await Visitor.aggregate([
-        {
-            $group: {
-                _id: null,
-                totalVisitors: { $sum: 1 },
-                averageAge: { $avg: "$age" },
-                mostInterestedCourse: { $max: "$interestedCourse" }
+    const [visitorStats, universitiesCount, coursesCount, jobsCount, newsCount] = await Promise.all([
+        Visitor.aggregate([
+            {
+                $facet: {
+                    "basicStats": [
+                        {
+                            $group: {
+                                _id: null,
+                                totalVisitors: { $sum: 1 },
+                                averageAge: { $avg: "$age" },
+                                maleCount: { $sum: { $cond: [{ $eq: ["$gender", "Male"] }, 1, 0] } },
+                                femaleCount: { $sum: { $cond: [{ $eq: ["$gender", "Female"] }, 1, 0] } },
+                                otherGenderCount: { $sum: { $cond: [{ $and: [{ $ne: ["$gender", "Male"] }, { $ne: ["$gender", "Female"] }] }, 1, 0] } },
+                                studentCount: { $sum: { $cond: [{ $eq: ["$visitorType", "Student"] }, 1, 0] } },
+                                workerCount: { $sum: { $cond: [{ $eq: ["$visitorType", "Worker"] }, 1, 0] } },
+                                totalDocumentsUploaded: { $sum: { $cond: [{ $isArray: "$documents" }, { $size: "$documents" }, 0] } },
+                                averageEducationLevel: { $avg: "$education.level" }
+                            }
+                        }
+                    ],
+                    "countryDistribution": [
+                        { $group: { _id: "$country", count: { $sum: 1 } } },
+                        { $sort: { count: -1 } },
+                        { $limit: 10 }
+                    ],
+                    "interestedCourses": [
+                        { $group: { _id: "$interestedCourse", count: { $sum: 1 } } },
+                        { $sort: { count: -1 } },
+                        { $limit: 10 },
+                        {
+                            $lookup: {
+                                from: "courses",
+                                localField: "_id",
+                                foreignField: "_id",
+                                as: "courseDetails"
+                            }
+                        },
+                        { $unwind: "$courseDetails" },
+                        { $project: { courseName: "$courseDetails.name", count: 1 } }
+                    ],
+                    "ageDistribution": [
+                        {
+                            $bucket: {
+                                groupBy: "$age",
+                                boundaries: [0, 18, 25, 35, 45, 55, 65],
+                                default: "65+",
+                                output: { count: { $sum: 1 } }
+                            }
+                        }
+                    ],
+                    "monthlyTrends": [
+                        {
+                            $group: {
+                                _id: { $dateToString: { format: "%Y-%m", date: "$createdAt" } },
+                                count: { $sum: 1 }
+                            }
+                        },
+                        { $sort: { _id: 1 } },
+                        { $limit: 12 }
+                    ],
+                    "educationLevelDistribution": [
+                        { $group: { _id: "$education.level", count: { $sum: 1 } } },
+                        { $sort: { count: -1 } }
+                    ],
+                    "preferredContactMethod": [
+                        { $group: { _id: "$preferredContact", count: { $sum: 1 } } },
+                        { $sort: { count: -1 } }
+                    ],
+                    "consultationBookingRate": [
+                        {
+                            $group: {
+                                _id: null,
+                                totalVisitors: { $sum: 1 },
+                                bookedConsultations: { $sum: { $cond: ["$isConsultationBooked", 1, 0] } }
+                            }
+                        },
+                        {
+                            $project: {
+                                bookingRate: { $divide: ["$bookedConsultations", "$totalVisitors"] }
+                            }
+                        }
+                    ]
+                }
+            },
+            {
+                $project: {
+                    basicStats: { $arrayElemAt: ["$basicStats", 0] },
+                    topCountries: "$countryDistribution",
+                    topInterestedCourses: "$interestedCourses",
+                    ageDistribution: "$ageDistribution",
+                    monthlyTrends: "$monthlyTrends",
+                    educationLevelDistribution: "$educationLevelDistribution",
+                    preferredContactMethod: "$preferredContactMethod",
+                    consultationBookingRate: { $arrayElemAt: ["$consultationBookingRate", 0] }
+                }
             }
-        }
+        ]),
+        University.countDocuments(),
+        Course.countDocuments(),
+        Job.countDocuments(),
+        News.countDocuments()
     ]);
 
-    res.status(200).json(new ApiResponse(200, stats[0], "Visitor statistics fetched successfully"));
+    if (!visitorStats || visitorStats.length === 0) {
+        throw new ApiError(404, "No visitor statistics available");
+    }
+
+    // Calculate additional metrics
+    const result = visitorStats[0];
+    result.basicStats.genderDistribution = {
+        male: result.basicStats.maleCount || 0,
+        female: result.basicStats.femaleCount || 0,
+        other: result.basicStats.otherGenderCount || 0
+    };
+    result.basicStats.visitorTypeDistribution = {
+        student: result.basicStats.studentCount || 0,
+        worker: result.basicStats.workerCount || 0
+    };
+    
+    // Handle potential null values for averageAge and averageEducationLevel
+    result.basicStats.averageAge = result.basicStats.averageAge 
+        ? parseFloat(result.basicStats.averageAge.toFixed(1)) 
+        : null;
+    result.basicStats.averageEducationLevel = result.basicStats.averageEducationLevel 
+        ? parseFloat(result.basicStats.averageEducationLevel.toFixed(1)) 
+        : null;
+
+    // Calculate total unique countries
+    result.totalUniqueCountries = result.topCountries ? result.topCountries.length : 0;
+
+    // Add counts for universities, courses, jobs, and news
+    result.totalCounts = {
+        universities: universitiesCount,
+        courses: coursesCount,
+        jobs: jobsCount,
+        news: newsCount
+    };
+
+    res.status(200).json(new ApiResponse(200, result, "Advanced visitor statistics fetched successfully"));
 });

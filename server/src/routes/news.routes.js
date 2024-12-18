@@ -10,17 +10,19 @@ import { protect, authorize } from '../middleware/auth.middleware.js';
 
 const router = express.Router();
 
-// Protected routes
-router.use(protect);
-
-// Create a new news (admin only)
-router.post('/news', authorize('admin', 'administrator'), createNews);
-
 // Get all news
 router.get('/news', getAllNews);
 
 // Get a news by ID
 router.get('/news/:id', getNewsById);
+
+// Protected routes
+router.use(protect);
+
+// Create a new news (admin only)
+router.post('/create', authorize('admin', 'administrator'), createNews);
+
+
 
 // Update a news by ID (admin only)
 router.put('/news/:id', authorize('admin', 'administrator'), updateNews);

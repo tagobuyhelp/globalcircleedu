@@ -12,33 +12,38 @@ const CourseSchema = new Schema({
     },
     program: {
         type: Types.ObjectId,
-        ref: 'Program', // Links the course to a specific program
+        ref: 'Program',
+        required: true,
+    },
+    university: {
+        type: Types.ObjectId,
+        ref: 'University',
         required: true,
     },
     credits: {
-        type: Number, // Example: 3, 6
+        type: Number,
         required: true,
         min: 0,
     },
     duration: {
-        type: String, // Example: "6 Weeks", "1 Semester"
+        type: String,
         required: true,
     },
     instructor: {
-        type: String, // Name of the instructor or professor
+        type: String,
         trim: true,
     },
     syllabus: {
-        type: String, // Path to a syllabus file or description
+        type: String,
         trim: true,
     },
     prerequisites: [{
-        type: String, // Course-specific requirements
+        type: String,
         trim: true,
     }],
     mode: {
         type: String,
-        enum: ['Online', 'Offline', 'Hybrid'], // Delivery method
+        enum: ['Online', 'Offline', 'Hybrid'],
         required: true,
     },
     fee: {

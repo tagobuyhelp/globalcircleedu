@@ -1,4 +1,6 @@
 import { User } from '../models/user.model.js';
+import { Visitor } from '../models/visitor.model.js';
+import { Agent } from '../models/agent.model.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { ApiError } from '../utils/apiError.js';
 import { ApiResponse } from '../utils/apiResponse.js';
@@ -7,10 +9,10 @@ import sendEmail from '../utils/sendEmail.js';
 
 // Register user
 export const register = asyncHandler(async (req, res) => {
-    const { username, email, password, role } = req.body;
+    const { email, password, role, phone, name } = req.body;
 
     // Define allowed roles
-    const allowedRoles = ['administrator', 'admin', 'editor', 'visitor'];
+    const allowedRoles = ['administrator', 'admin', 'editor', 'visitor', 'agent'];
 
     // Check if the role is valid
     if (!allowedRoles.includes(role)) {
@@ -41,11 +43,27 @@ export const register = asyncHandler(async (req, res) => {
     }
 
     const user = await User.create({
-        username,
+        name,
         email,
         password,
         role,
+        phone
     });
+
+    // If the role is 'visitor' or 'agent', create the corresponding entry
+    if (role === 'visitor') {
+        await Visitor.create({
+            name,
+            email,
+            phone,
+        });
+    } else if (role === 'agent') {
+        await Agent.create({
+            name,
+            email,
+            phone,
+        });
+    }
 
     sendTokenResponse(user, 201, res);
 });

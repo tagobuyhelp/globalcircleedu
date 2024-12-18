@@ -2,11 +2,11 @@ import mongoose from 'mongoose';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
+
 const userSchema = new mongoose.Schema({
-    username: {
+    name: {
         type: String,
-        required: [true, 'Please provide a username'],
-        unique: true,
+        required: [true, 'Please provide a name'],
         trim: true,
     },
     email: {
@@ -14,6 +14,11 @@ const userSchema = new mongoose.Schema({
         required: [true, 'Please provide an email'],
         unique: true,
         match: [/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/, 'Please provide a valid email'],
+    },
+    phone: {
+        type: String,
+        required: [true, 'Please provide a phone number'],
+        trim: true,
     },
     password: {
         type: String,
@@ -23,7 +28,7 @@ const userSchema = new mongoose.Schema({
     },
     role: {
         type: String,
-        enum: ['administrator', 'admin', 'editor', 'visitor'],
+        enum: ['administrator', 'admin', 'editor', 'agent', 'visitor'],
         default: 'visitor'
     },
     resetPasswordOtp: {

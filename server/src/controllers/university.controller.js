@@ -1,5 +1,8 @@
 import { University } from "../models/university.model.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
+import { ApiResponse } from "../utils/ApiResponse.js";
+import { ApiError } from "../utils/apiError.js";
+const BASE_URL = process.env.BASE_URL || "http://localhost:5000";
 
 export const createUniversity = async (req, res) => {
     try {
