@@ -14,7 +14,7 @@ const serviceSchema = new Schema({
     type: {
         type: String,
         required: [true, "Service type is required"],
-        enum: ['Study Abroad', 'Job Placement', 'Other']
+        enum: ['Study Abroad', 'Job Placement', 'Other', 'All']
     },
     fees: [{
         type: Schema.Types.ObjectId,
@@ -30,15 +30,6 @@ const serviceSchema = new Schema({
         type: Boolean,
         default: true
     },
-    createdBy: {
-        type: Schema.Types.ObjectId,
-        ref: 'User',
-        required: true
-    },
-    updatedBy: {
-        type: Schema.Types.ObjectId,
-        ref: 'User'
-    }
 }, { timestamps: true });
 
 // Virtual for calculating total mandatory fees

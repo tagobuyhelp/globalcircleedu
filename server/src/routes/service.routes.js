@@ -18,7 +18,7 @@ router.get('/:id', getServiceById);
 router.use(protect);
 
 // Admin only routes
-router.post('/', authorize('admin', 'administrator'), createService);
+router.post('/create', authorize('admin', 'administrator'), createService);
 router.put('/:id', authorize('admin', 'administrator'), updateService);
 router.delete('/:id', authorize('admin', 'administrator'), deleteService);
 

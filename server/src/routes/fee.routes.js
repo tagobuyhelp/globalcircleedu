@@ -22,7 +22,7 @@ router.get('/applicable/:applicableTo', getFeesByApplicability);
 router.use(protect);
 
 // Admin only routes
-router.post('/', authorize('admin', 'administrator'), createFee);
+router.post('/create', authorize('admin', 'administrator'), createFee);
 router.put('/:id', authorize('admin', 'administrator'), updateFee);
 router.delete('/:id', authorize('admin', 'administrator'), deleteFee);
 

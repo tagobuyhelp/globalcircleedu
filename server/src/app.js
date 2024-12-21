@@ -2,8 +2,18 @@ import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import errorMiddleware from './middleware/error.middleware.js';
+import http from 'http';
+import { Server } from 'socket.io';
 
 const app = express();
+const server = http.createServer(app);
+const io = new Server(server, {
+    cors: {
+        origin: ['http://localhost:4000', 'https://tagobuy.net', 'https://www.tagobuy.net'],
+        methods: ['GET', 'POST'],
+        credentials: true
+    }
+});
 
 // CORS configuration
 const allowedOrigins = ['http://localhost:4000', 'https://tagobuy.net', 'https://www.tagobuy.net'];
@@ -48,6 +58,9 @@ import serviceRoutes from './routes/service.routes.js';
 import feeRoutes from './routes/fee.routes.js';
 import adminRoutes from './routes/admin.routes.js';
 import agentRoutes from './routes/agent.routes.js';
+import chatRoutes from './routes/chat.routes.js';
+import paymentRoutes from './routes/payment.routes.js';
+import billingRoutes from './routes/billing.routes.js';
 
 // Route declaration
 app.use("/users", userRouter);
@@ -60,11 +73,13 @@ app.use("/news", newsRouter);
 app.use("/job", jobRouter);
 app.use("/degree", degreeRouter);
 app.use("/program", programRouter);
-app.use('/services', serviceRoutes)
+app.use('/service', serviceRoutes)
 app.use('/fees', feeRoutes);
 app.use("/admin", adminRoutes);
 app.use("/agent", agentRoutes);
-
+app.use("/chat", chatRoutes);
+app.use("/payment", paymentRoutes);
+app.use("/billing", billingRoutes);
 
 // Add this route before the catch-all handler
 app.get('/:filename', (req, res) => {
@@ -92,4 +107,18 @@ app.use('*', (req, res, next) => {
 app.use(errorMiddleware);
 
 
-export { app };
+// WebSocket connection handling
+io.on('connection', (socket) => {
+    console.log('A user connected');
+
+    socket.on('chat message', (msg) => {
+        io.emit('chat message', msg);
+    });
+
+    socket.on('disconnect', () => {
+        console.log('User disconnected');
+    });
+});
+
+
+export { app, server };

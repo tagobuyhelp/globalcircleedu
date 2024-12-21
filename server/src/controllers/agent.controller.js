@@ -1,4 +1,5 @@
 import { Agent } from "../models/agent.model.js";
+import { User } from "../models/user.model.js";
 import { Application } from "../models/application.model.js";
 import { WithdrawalRequest } from "../models/withdrawalRequest.model.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
@@ -69,28 +70,53 @@ export const updateApplication = asyncHandler(async (req, res) => {
 });
 
 export const getAgentStats = asyncHandler(async (req, res) => {
-    const agentId = req.user._id;
-    const agent = await Agent.findById(agentId);
-    const stats = await Application.aggregate([
-        { $match: { agentId: agent._id } },
-        {
-            $group: {
-                _id: null,
-                totalApplications: { $sum: 1 },
-                approvedApplications: { $sum: { $cond: [{ $eq: ["$status", "Approved"] }, 1, 0] } },
-                totalCommission: { $sum: "$commissionAmount" }
-            }
-        }
-    ]);
+    // Check if req.user exists and has _id
+    if (!req.user || !req.user._id) {
+        console.error('User not authenticated or missing _id');
+        throw new ApiError(401, "User not authenticated");
+    }
 
-    res.status(200).json({
-        success: true,
-        stats: {
-            ...stats[0],
-            totalEarned: agent.totalEarned,
-            availableBalance: agent.availableBalance
+    const userId = req.user._id;
+
+
+    try {
+        const user = await User.findById(userId);
+        if (!user) {
+            console.error('User not found for ID:', userId);
+            throw new ApiError(404, "User not found");
         }
-    });
+
+        const agent = await Agent.findOne({ email: user.email });
+        if (!agent) {
+            console.error('Agent not found for email:', user.email);
+            throw new ApiError(404, "Agent not found");
+        }
+
+        const stats = await Application.aggregate([
+            { $match: { agentId: agent._id } },
+            {
+                $group: {
+                    _id: null,
+                    totalApplications: { $sum: 1 },
+                    approvedApplications: { $sum: { $cond: [{ $eq: ["$status", "Approved"] }, 1, 0] } },
+                    totalCommission: { $sum: "$commissionAmount" }
+                }
+            }
+        ]);
+
+
+        res.status(200).json({
+            success: true,
+            stats: {
+                ...(stats[0] || { totalApplications: 0, approvedApplications: 0, totalCommission: 0 }),
+                totalEarned: agent.totalEarned || 0,
+                availableBalance: agent.availableBalance || 0
+            }
+        });
+    } catch (error) {
+        console.error('Error in getAgentStats:', error);
+        throw new ApiError(500, "Error fetching agent stats: " + error.message);
+    }
 });
 
 export const requestWithdrawal = asyncHandler(async (req, res) => {
@@ -118,17 +144,21 @@ export const requestWithdrawal = asyncHandler(async (req, res) => {
 });
 
 export const getWithdrawalRequests = asyncHandler(async (req, res) => {
-    const agentId = req.user._id;
+    const email = req.user.email;
+
+    const agentId = await Agent.findOne({ email })._id;
+
     const withdrawalRequests = await WithdrawalRequest.find({ agent: agentId });
     res.status(200).json({ success: true, withdrawalRequests });
 });
 
 export const updatePaymentMethod = asyncHandler(async (req, res) => {
-    const agentId = req.user._id;
+    const email = req.user.email;
+
     const { paymentMethod, paymentDetails } = req.body;
 
-    const agent = await Agent.findByIdAndUpdate(
-        agentId,
+    const agent = await Agent.findOneAndUpdate(
+        {email: email},
         { paymentMethod, paymentDetails },
         { new: true, runValidators: true }
     );

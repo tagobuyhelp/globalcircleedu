@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Tagobuy Server",
   "main": "index.js",
-  "type":"module",
+  "type": "module",
   "scripts": {
     "dev": "nodemon -r dotenv/config --experimental-json-modules src/index.js",
     "start": "node -r dotenv/config src/index.js"
@@ -27,6 +27,9 @@
     "node-cron": "^3.0.3",
     "nodemailer": "^6.9.15",
     "nodemon": "^3.1.7",
-    "prettier": "^3.3.3"
+    "prettier": "^3.3.3",
+    "razorpay": "^2.9.5",
+    "socket.io": "^4.8.1",
+    "stripe": "^17.5.0"
   }
 }
