@@ -1,4 +1,4 @@
-import { ApiResponse } from "../utils/ApiResponse.js";
+import { ApiResponse } from "../utils/apiResponse.js";
 import { University } from "../models/university.model.js";
 import { Program } from "../models/program.model.js";
 import { Course } from "../models/course.model.js";
