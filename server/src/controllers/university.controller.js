@@ -4,6 +4,7 @@ import { Program } from "../models/program.model.js";
 import { Course } from "../models/course.model.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/apiError.js";
+import { getPhotoPath } from "../middleware/photoUpload.middleware.js";
 const BASE_URL = process.env.BASE_URL || "http://localhost:5000";
 
 export const createUniversity = async (req, res) => {
