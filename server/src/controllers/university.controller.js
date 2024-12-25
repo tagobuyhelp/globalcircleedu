@@ -1,6 +1,8 @@
-import { University } from "../models/university.model.js";
-import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
+import { University } from "../models/university.model.js";
+import { Program } from "../models/program.model.js";
+import { Course } from "../models/course.model.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/apiError.js";
 const BASE_URL = process.env.BASE_URL || "http://localhost:5000";
 
@@ -25,7 +27,12 @@ export const createUniversity = async (req, res) => {
 };
 
 export const getAllUniversities = asyncHandler(async (req, res) => {
-    const universities = await University.find();
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
+
+    const totalUniversities = await University.countDocuments();
+    const universities = await University.find().skip(skip).limit(limit);
 
     // Add base URL to logo and campus photos
     const universitiesWithFullUrls = universities.map(uni => {
@@ -39,15 +46,31 @@ export const getAllUniversities = asyncHandler(async (req, res) => {
         return uniObj;
     });
 
-    res.status(200).json(new ApiResponse(200, universitiesWithFullUrls, "Universities fetched successfully"));
+    const totalPages = Math.ceil(totalUniversities / limit);
+
+    res.status(200).json(new ApiResponse(200, {
+        universities: universitiesWithFullUrls,
+        currentPage: page,
+        totalPages: totalPages,
+        totalUniversities: totalUniversities
+    }, "Universities fetched successfully"));
 });
 
 export const getUniversityById = asyncHandler(async (req, res) => {
     const universityId = req.params.id;
     const university = await University.findById(universityId);
+
     if (!university) {
         throw new ApiError(404, "University not found");
     }
+
+    // Fetch programs for this university
+    const programs = await Program.find({ university: universityId })
+        .populate('degree', 'name');
+
+    // Fetch courses for this university's programs
+    const programIds = programs.map(program => program._id);
+    const courses = await Course.find({ program: { $in: programIds } });
 
     // Add base URL to logo and campus photos
     const uniObj = university.toObject();
@@ -57,6 +80,13 @@ export const getUniversityById = asyncHandler(async (req, res) => {
     if (uniObj.campusPhotos) {
         uniObj.campusPhotos = uniObj.campusPhotos.map(photo => `${BASE_URL}/${photo}`);
     }
+
+    // Add programs and courses to the university object
+    uniObj.programs = programs.map(program => {
+        const programObj = program.toObject();
+        programObj.courses = courses.filter(course => course.program.toString() === program._id.toString());
+        return programObj;
+    });
 
     res.status(200).json(new ApiResponse(200, uniObj, "University fetched successfully"));
 });

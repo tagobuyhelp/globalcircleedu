@@ -44,10 +44,6 @@ const UniversitySchema = new Schema({
         type: String,
     },
     campusPhotos: [String],
-    courses: [{ 
-        type: Types.ObjectId, 
-        ref: 'Course',
-    }],
 }, { timestamps: true });
 
 export const University = mongoose.model('University', UniversitySchema);

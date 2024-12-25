@@ -13,24 +13,35 @@ export const getAllCourses = asyncHandler(async (req, res) => {
     const courses = await Course.find()
         .populate({
             path: 'program', // Populate the 'program' field
-            populate: {
-                path: 'degree', // Populate the 'degree' field inside the populated 'program'
-            },
+            populate: [
+                {
+                    path: 'degree', // Populate the 'degree' field inside the populated 'program'
+                },
+                {
+                    path: 'university', // Populate the 'university' field inside the populated 'program'
+                },
+            ],
         });
 
     res.status(200).json(courses);
 });
 
 
+
 export const getCourseById = asyncHandler(async (req, res) => {
     const courseId = req.params.id;
     const course = await Course.findById(courseId)
-        .populate({
-            path: 'program', // Populate the 'program' field
-            populate: {
+    .populate({
+        path: 'program', // Populate the 'program' field
+        populate: [
+            {
                 path: 'degree', // Populate the 'degree' field inside the populated 'program'
             },
-        });
+            {
+                path: 'university', // Populate the 'university' field inside the populated 'program'
+            },
+        ],
+    });
     if (!course) {
         return res.status(404).json({ success: false, message: 'Course not found' });
     }

@@ -72,24 +72,60 @@ export const register = asyncHandler(async (req, res) => {
 export const login = asyncHandler(async (req, res, next) => {
     const { email, password } = req.body;
 
+    // Check if email and password are provided
     if (!email || !password) {
         throw new ApiError(400, 'Please provide an email and password');
     }
 
+    // Find the user and include the password field for validation
     const user = await User.findOne({ email }).select('+password');
 
+    // Check if user exists
     if (!user) {
         throw new ApiError(401, 'Invalid credentials');
     }
 
+    // Validate the password
     const isMatch = await user.matchPassword(password);
-
     if (!isMatch) {
         throw new ApiError(401, 'Invalid credentials');
     }
 
-    sendTokenResponse(user, 200, res);
+    // Construct user profile excluding the password
+    const userProfile = {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        phone: user.phone,
+    };
+
+    // Generate token and send response
+    const token = user.getSignedJwtToken();
+    const options = {
+        expires: new Date(
+            Date.now() + parseInt(process.env.JWT_COOKIE_EXPIRE) * 24 * 60 * 60 * 1000
+        ),
+        httpOnly: true,
+    };
+
+    if (process.env.NODE_ENV === 'production') {
+        options.secure = true;
+    }
+
+    res.status(200)
+        .cookie('token', token, options)
+        .json({
+            statusCode: 200,
+            data: {
+                token,
+                userProfile,
+            },
+            message: 'User logged in successfully',
+            success: true,
+        });
 });
+
 
 // Forgot password
 export const forgotPassword = asyncHandler(async (req, res, next) => {
@@ -187,9 +223,22 @@ const sendTokenResponse = (user, statusCode, res) => {
     if (process.env.NODE_ENV === 'production') {
         options.secure = true;
     }
-
-    res
-        .status(statusCode)
-        .cookie('token', token, options)
-        .json(new ApiResponse(statusCode, { token }, 'User logged in successfully'));
+    const userProfile = {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        phone: user.phone,
+    };
+    
+    // Response
+    res.status(200).json({
+        statusCode: 200,
+        data: {
+            token,
+            userProfile,
+        },
+        message: "User logged in successfully",
+        success: true,
+    });
 };
