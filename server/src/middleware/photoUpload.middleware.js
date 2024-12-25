@@ -70,5 +70,5 @@ export const uploadPhotos = multer({
 
 // Function to construct a valid photo URL or relative path
 export const getPhotoPath = (filename) => {
-    return `images/photos/${filename}`; // Adjust to your desired path handling logic
+    return `${filename}`; // Adjust to your desired path handling logic
 };
