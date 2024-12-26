@@ -146,21 +146,7 @@ export const JourneySection = () => {
           onStepChange={setActiveStep}
         />
 
-        {/* Progress indicator */}
-        <div className="mt-8 flex justify-center items-center space-x-2">
-          {journeySteps.map((_, index) => (
-            <button
-              key={index}
-              onClick={() => setActiveStep(index)}
-              className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                index === activeStep 
-                  ? 'w-8 bg-indigo-600 dark:bg-indigo-400' 
-                  : 'bg-gray-300 dark:bg-gray-600 hover:bg-indigo-400 dark:hover:bg-indigo-500'
-              }`}
-              aria-label={`Go to step ${index + 1}`}
-            />
-          ))}
-        </div>
+        
       </div>
     </section>
   );

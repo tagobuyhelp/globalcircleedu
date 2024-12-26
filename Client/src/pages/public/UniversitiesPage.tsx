@@ -6,7 +6,6 @@ import { Footer } from '../../components/layout/Footer';
 import { LoadingSpinner } from '../../components/ui/LoadingSpinner';
 import { UniversityGrid } from '../../features/universities/components/UniversityGrid';
 import { UniversityFilters } from '../../features/universities/components/UniversityFilters';
-import { Pagination } from '../../components/ui/Pagination';
 import { useFilters } from '../../hooks/useFilters';
 import { useViewToggle } from '../../hooks/useViewToggle';
 import { universityApi } from '../../features/universities/api/universityApi';
@@ -22,8 +21,6 @@ const initialFilters = {
 export const UniversitiesPage = () => {
   const navigate = useNavigate();
   const [universities, setUniversities] = useState<University[]>([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
@@ -41,9 +38,8 @@ export const UniversitiesPage = () => {
     const fetchUniversities = async () => {
       try {
         setLoading(true);
-        const data = await universityApi.getAll(currentPage);
+        const data = await universityApi.getAll();
         setUniversities(data.universities);
-        setTotalPages(data.totalPages);
       } catch (err) {
         console.error('Error fetching universities:', err);
         setError('Failed to load universities');
@@ -53,11 +49,11 @@ export const UniversitiesPage = () => {
     };
 
     fetchUniversities();
-  }, [currentPage]);
+  }, []);
 
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+  const handleUniversitySelect = (id: string) => {
+    console.log('Navigating to university:', id);
+    navigate(`/universities/${id}`);
   };
 
   const filteredUniversities = universities.filter(university => {
@@ -124,19 +120,8 @@ export const UniversitiesPage = () => {
               universities={filteredUniversities}
               view={view}
               onViewChange={toggleView}
-              onSelect={(id) => navigate(`/universities/${id}`)}
+              onSelect={handleUniversitySelect}
             />
-
-            {/* Pagination */}
-            {!searchTerm && totalPages > 1 && (
-              <div className="mt-8">
-                <Pagination
-                  currentPage={currentPage}
-                  totalPages={totalPages}
-                  onPageChange={handlePageChange}
-                />
-              </div>
-            )}
           </div>
         </div>
 

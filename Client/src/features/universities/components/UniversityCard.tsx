@@ -6,33 +6,24 @@ import type { University } from '../types/university';
 
 interface UniversityCardProps {
   university: University;
-  onViewDetails?: (universityId: string) => void;
+  onViewDetails?: (id: string) => void;
 }
 
 export const UniversityCard: React.FC<UniversityCardProps> = ({ 
   university, 
   onViewDetails 
 }) => {
-  const handleCardClick = () => {
-    console.log('Card clicked:', university._id);
-    if (onViewDetails) {
-      onViewDetails(university._id);
-    }
-  };
-
-  const handleButtonClick = (e: React.MouseEvent) => {
-    e.stopPropagation(); // Prevent propagation to the card's onClick
-    console.log('Button clicked:', university._id);
-    if (onViewDetails) {
+  const handleViewDetails = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (onViewDetails && university._id) {
+      console.log('View Details clicked for university:', university._id);
       onViewDetails(university._id);
     }
   };
 
   return (
-    <Card 
-      className="overflow-hidden cursor-pointer transition-transform duration-300 hover:scale-105"
-      onClick={handleCardClick}
-    >
+    <Card className="overflow-hidden hover:shadow-lg transition-all duration-300">
       <img
         src={university.logo || 'https://images.unsplash.com/photo-1607237138185-eedd9c632b0b'}
         alt={university.name}
@@ -66,7 +57,7 @@ export const UniversityCard: React.FC<UniversityCardProps> = ({
         <div className="mt-4">
           <Button 
             className="w-full"
-            onClick={handleButtonClick}
+            onClick={handleViewDetails}
           >
             View Details
           </Button>
