@@ -7,8 +7,9 @@ const chatMessageSchema = new Schema({
         required: true
     },
     receiver: {
-        type: Schema.Types.ObjectId,
-        ref: 'User',
+        type: String,
+        default: 'Admin',
+        required: true
     },
     message: {
         type: String,
