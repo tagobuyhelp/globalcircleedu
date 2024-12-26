@@ -1,25 +1,13 @@
-import mongoose, { Schema } from "mongoose";
+import express from 'express';
+import { saveMessage, getMessages, markMessagesAsRead } from '../controllers/chat.controller.js';
+import { protect } from '../middleware/auth.middleware.js';
 
-const chatMessageSchema = new Schema({
-    sender: {
-        type: Schema.Types.ObjectId,
-        ref: 'User',
-        required: true
-    },
-    receiver: {
-        type: String,
-        default: 'Admin',
-        required: true
-    },
-    message: {
-        type: String,
-        required: true,
-        trim: true
-    },
-    read: {
-        type: Boolean,
-        default: false
-    }
-}, { timestamps: true });
+const router = express.Router();
 
-export const ChatMessage = mongoose.model('ChatMessage', chatMessageSchema);
+router.use(protect); // Protect all chat routes
+
+router.post('/send', saveMessage);
+router.get('/:userId', getMessages);
+router.put('/:userId/read', markMessagesAsRead);
+
+export default router;
