@@ -7,6 +7,10 @@ export const saveMessage = asyncHandler(async (req, res) => {
 
     const newMessage = await ChatMessage.create({ sender, receiver, message });
 
+    // Populate the sender and receiver fields of the new message
+    await newMessage.populate('sender', 'name email');
+    await newMessage.populate('receiver', 'name email');
+
     res.status(201).json({
         success: true,
         message: "Message sent successfully",
@@ -30,6 +34,11 @@ export const getMessages = asyncHandler(async (req, res) => {
 
     // Group messages by conversation (i.e., by the other user involved)
     const groupedMessages = messages.reduce((acc, message) => {
+        if (!message.sender || !message.receiver) {
+            console.error('Invalid message:', message);
+            return acc; // Skip this message
+        }
+
         const otherUser = message.sender._id.toString() === userId 
             ? message.receiver._id.toString() 
             : message.sender._id.toString();
@@ -42,13 +51,23 @@ export const getMessages = asyncHandler(async (req, res) => {
     }, {});
 
     // Format the response
-    const conversations = Object.keys(groupedMessages).map(otherUserId => ({
-        otherUser: groupedMessages[otherUserId][0].sender._id.toString() === userId 
-            ? groupedMessages[otherUserId][0].receiver 
-            : groupedMessages[otherUserId][0].sender,
-        lastMessage: groupedMessages[otherUserId][0],
-        messages: groupedMessages[otherUserId]
-    }));
+    const conversations = Object.keys(groupedMessages).map(otherUserId => {
+        const conversation = groupedMessages[otherUserId];
+        const firstValidMessage = conversation.find(msg => msg.sender && msg.receiver);
+        
+        if (!firstValidMessage) {
+            console.error('No valid messages in conversation:', otherUserId);
+            return null; // Skip this conversation
+        }
+
+        return {
+            otherUser: firstValidMessage.sender._id.toString() === userId 
+                ? firstValidMessage.receiver 
+                : firstValidMessage.sender,
+            lastMessage: conversation[0],
+            messages: conversation
+        };
+    }).filter(Boolean); // Remove any null entries
 
     res.status(200).json({
         success: true,
