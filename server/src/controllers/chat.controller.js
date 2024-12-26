@@ -22,18 +22,13 @@ export const getMessages = asyncHandler(async (req, res) => {
     const { userId } = req.params;
 
     // Fetch all messages where the user is the sender and Admin is the receiver, or vice versa
-    const messages = await ChatMessage.find({
-        $or: [
-            { sender: userId, receiver: 'Admin' },
-            { sender: 'Admin', receiver: userId }
-        ]
-    })
+    const messages = await ChatMessage.find({sender: userId})
     .sort({ createdAt: -1 }) // Sort by most recent first
     .populate('sender', 'name email'); // Populate sender details
 
     // Format the response
     const conversation = {
-        otherUser: { name: 'Admin', email: 'admin@example.com' }, // You can set appropriate admin details
+        otherUser: { name: 'Admin'}, // You can set appropriate admin details
         lastMessage: messages[0] || null,
         messages: messages
     };
