@@ -9,7 +9,7 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
     cors: {
-        origin: ['http://localhost:4000', 'https://tagobuy.net', 'https://www.tagobuy.net'],
+        origin: ['http://localhost:4000', 'https://globalcircleedu.tagobuy.site', 'https://globalcircleedu.netlify.app'],
         methods: ['GET', 'POST'],
         credentials: true
     }
