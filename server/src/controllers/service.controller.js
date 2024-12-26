@@ -18,9 +18,17 @@ export const createService = asyncHandler(async (req, res) => {
 });
 
 export const getAllServices = asyncHandler(async (req, res) => {
-    const services = await Service.find();
+    const services = await Service.find().populate('fees');
+    
+    if (!services || services.length === 0) {
+        return res
+            .status(404)
+            .json(new ApiResponse(404, null, "No services found"));
+    }
+
     res.status(200).json(new ApiResponse(200, services, "Services retrieved successfully"));
 });
+
 
 export const getServiceById = asyncHandler(async (req, res) => {
     const service = await Service.findById(req.params.id);
