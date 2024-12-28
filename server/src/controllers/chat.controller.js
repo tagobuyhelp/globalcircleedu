@@ -1,20 +1,18 @@
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ChatMessage } from '../models/chatMessage.model.js';
 
-export const saveMessage = asyncHandler(async (req, res) => {
+export const saveVisitorMessage = asyncHandler(async (req, res) => {
     const { message } = req.body;
-    const sender = req.user._id;
-    const receiver = 'Admin'; // Set receiver as 'Admin' for user messages
+    const visitorId = req.user._id;
 
-    const newMessage = await ChatMessage.create({ 
-        sender, 
-        receiver, 
+    const newMessage = await ChatMessage.create({
+        visitorId,
         message,
-        read: false // New messages are unread by default
+        isFromAdmin: false,
+        read: false
     });
 
-    // Populate the sender field of the new message
-    await newMessage.populate('sender', 'name email');
+    await newMessage.populate('visitorId', 'name email');
 
     res.status(201).json({
         success: true,
@@ -24,14 +22,13 @@ export const saveMessage = asyncHandler(async (req, res) => {
 });
 
 export const saveAdminMessage = asyncHandler(async (req, res) => {
-    const { message, receiverId } = req.body;
-    const sender = 'Admin';
+    const { message, visitorId } = req.body;
 
-    const newMessage = await ChatMessage.create({ 
-        sender, 
-        receiver: receiverId,
+    const newMessage = await ChatMessage.create({
+        visitorId,
         message,
-        read: false // New messages are unread by default
+        isFromAdmin: true,
+        read: false
     });
 
     res.status(201).json({
@@ -41,29 +38,18 @@ export const saveAdminMessage = asyncHandler(async (req, res) => {
     });
 });
 
-export const getMessagesBySender = asyncHandler(async (req, res) => {
-    const userId = req.user._id;
+export const getMessagesByVisitor = asyncHandler(async (req, res) => {
+    const visitorId = req.user._id;
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 20;
     const skip = (page - 1) * limit;
 
-    const messages = await ChatMessage.find({ 
-        $or: [
-            { sender: userId, receiver: 'Admin' },
-            { sender: 'Admin', receiver: userId }
-        ]
-    })
-    .sort({ createdAt: -1 })
-    .skip(skip)
-    .limit(limit)
-    .populate('sender', 'name email');
+    const messages = await ChatMessage.find({ visitorId })
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit);
 
-    const total = await ChatMessage.countDocuments({
-        $or: [
-            { sender: userId, receiver: 'Admin' },
-            { sender: 'Admin', receiver: userId }
-        ]
-    });
+    const total = await ChatMessage.countDocuments({ visitorId });
 
     res.status(200).json({
         success: true,
@@ -81,29 +67,19 @@ export const getMessagesByAdmin = asyncHandler(async (req, res) => {
     const limit = parseInt(req.query.limit) || 20;
     const skip = (page - 1) * limit;
 
-    // Get total count of unique senders
-    const totalSenders = await ChatMessage.distinct('sender').count();
+    const distinctVisitors = await ChatMessage.distinct('visitorId');
+    const totalVisitors = distinctVisitors.length;
 
-    // Get paginated list of senders
-    const senders = await ChatMessage.distinct('sender')
-        .sort({ createdAt: -1 })
-        .skip(skip)
-        .limit(limit);
+    const visitors = distinctVisitors.slice(skip, skip + limit);
 
-    // Fetch messages for each sender
     const groupedMessages = {};
-    for (const sender of senders) {
-        const messages = await ChatMessage.find({
-            $or: [
-                { sender: sender, receiver: 'Admin' },
-                { sender: 'Admin', receiver: sender }
-            ]
-        })
-        .sort({ createdAt: -1 })
-        .limit(10)  // Limit to last 10 messages per sender
-        .populate('sender', 'name email');
+    for (const visitorId of visitors) {
+        const messages = await ChatMessage.find({ visitorId })
+            .sort({ createdAt: -1 })
+            .limit(10)
+            .populate('visitorId', 'name email');
 
-        groupedMessages[sender] = messages;
+        groupedMessages[visitorId] = messages;
     }
 
     res.status(200).json({
@@ -111,17 +87,17 @@ export const getMessagesByAdmin = asyncHandler(async (req, res) => {
         data: {
             conversations: groupedMessages,
             currentPage: page,
-            totalPages: Math.ceil(totalSenders / limit),
-            totalSenders: totalSenders
+            totalPages: Math.ceil(totalVisitors / limit),
+            totalVisitors: totalVisitors
         }
     });
 });
 
 export const markMessagesAsRead = asyncHandler(async (req, res) => {
-    const { userId } = req.params;
+    const visitorId = req.user._id;
 
     await ChatMessage.updateMany(
-        { sender: 'Admin', receiver: userId, read: false },
+        { visitorId, isFromAdmin: true, read: false },
         { $set: { read: true } }
     );
 
