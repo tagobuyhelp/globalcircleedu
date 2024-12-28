@@ -16,7 +16,7 @@ router.get('/visitor', protect, getMessagesByVisitor);
 router.put('/visitor/read', protect, markMessagesAsRead);
 
 // Admin routes
-router.post('/admin', protect, authorize('admin'), saveAdminMessage);
-router.get('/admin', protect, authorize('admin'), getMessagesByAdmin);
+router.post('/admin', protect, authorize('admin', 'administrator', 'editor'), saveAdminMessage);
+router.get('/admin', protect, authorize('admin', 'administrator', 'editor'), getMessagesByAdmin);
 
 export default router;
