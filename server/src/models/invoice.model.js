@@ -7,12 +7,6 @@ const invoiceSchema = new Schema({
         required: true,
         trim: true,
     },
-    subscriptionId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Subscription',
-        required: true,
-        index: true,
-    },
     amountDue: {
         type: Number,
         required: true,

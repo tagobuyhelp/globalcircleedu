@@ -11,7 +11,7 @@ const razorpay = new Razorpay({
 });
 
 export const createPayment = asyncHandler(async (req, res) => {
-    const { amount, currency, paymentMethod, serviceId } = req.body;
+    const { amount, currency, paymentMethod, serviceId, offlineDetails } = req.body;
     const userId = req.user._id;
 
     let payment;
@@ -48,6 +48,27 @@ export const createPayment = asyncHandler(async (req, res) => {
             razorpayOrderId: order.id,
             status: 'pending',
             service: serviceId
+        });
+    } else if (paymentMethod === 'offline') {
+        // Handle offline payment
+        payment = await Payment.create({
+            user: userId,
+            amount,
+            currency,
+            paymentMethod,
+            status: 'pending',
+            service: serviceId,
+            offlineDetails: offlineDetails || {}
+        });
+
+        // Create a pending billing record
+        await Billing.create({
+            user: userId,
+            service: serviceId,
+            amount,
+            currency,
+            status: 'pending',
+            payment: payment._id
         });
     } else {
         return res.status(400).json({

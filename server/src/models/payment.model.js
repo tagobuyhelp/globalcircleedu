@@ -43,6 +43,10 @@ const paymentSchema = new mongoose.Schema({
         type: String,
         unique: true,
         sparse: true
+    },
+    offlineDetails: {
+        type: mongoose.Schema.Types.Mixed,
+        default: {}
     }
 }, { timestamps: true });
 
