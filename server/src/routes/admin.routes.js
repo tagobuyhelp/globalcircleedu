@@ -5,7 +5,8 @@ import {
     updateApplicationStatus,
     getApplicationStats,
     getWithdrawalRequests,
-    handleWithdrawalRequest
+    handleWithdrawalRequest,
+    createApplication
 } from '../controllers/admin.controller.js';
 
 const router = express.Router();
@@ -16,6 +17,8 @@ router.use(authorize('admin', 'administrator'));
 
 router.route('/applications')
     .get(getAllApplications);
+
+router.post('/applications', createApplication)
 
 router.route('/applications/:id')
     .put(updateApplicationStatus);

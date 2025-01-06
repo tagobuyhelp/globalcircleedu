@@ -32,13 +32,24 @@ const serviceSchema = new Schema({
     },
 }, { timestamps: true });
 
-// Virtual for calculating total mandatory fees
-serviceSchema.virtual('totalMandatoryFees').get(async function() {
-    await this.populate('fees');
-    return this.fees
-        .filter(fee => !fee.isOptional && fee.isActive)
-        .reduce((sum, fee) => sum + fee.amount, 0);
-});
+// Method for calculating total mandatory fees
+serviceSchema.methods.calculateTotalMandatoryFees = async function() {
+    try {
+        await this.populate('fees');
+        
+        if (!this.fees || !Array.isArray(this.fees)) {
+            console.warn('Fees not populated or not an array:', this.fees);
+            return 0;
+        }
+
+        return this.fees
+            .filter(fee => fee && !fee.isOptional && fee.isActive)
+            .reduce((sum, fee) => sum + (fee.amount || 0), 0);
+    } catch (error) {
+        console.error('Error calculating totalMandatoryFees:', error);
+        return 0;
+    }
+};
 
 // Ensure virtuals are included in JSON output
 serviceSchema.set('toJSON', { virtuals: true });

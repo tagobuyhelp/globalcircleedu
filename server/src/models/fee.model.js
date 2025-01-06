@@ -41,17 +41,9 @@ const feeSchema = new Schema({
     },
 }, { timestamps: true });
 
-// Index for efficient querying
-feeSchema.index({ name: 1, applicableTo: 1 });
-
-// Virtual for checking if the fee is currently active
 feeSchema.virtual('isActive').get(function() {
     const now = new Date();
     return (!this.expirationDate || this.expirationDate > now) && this.effectiveDate <= now;
 });
-
-// Ensure virtuals are included in JSON output
-feeSchema.set('toJSON', { virtuals: true });
-feeSchema.set('toObject', { virtuals: true });
 
 export const Fee = mongoose.model('Fee', feeSchema);

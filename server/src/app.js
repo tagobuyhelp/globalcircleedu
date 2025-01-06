@@ -16,7 +16,7 @@ const io = new Server(server, {
 });
 
 // CORS configuration
-const allowedOrigins = ['http://localhost:4000', 'https://globalcircleedu.tagobuy.site', 'https://www.tagobuy.net', 'https://globalcircleedu.netlify.app', 'http://localhost:5173'];
+const allowedOrigins = ['http://localhost:4000', 'https://globalcircleedu.tagobuy.site', 'https://unrivaled-genie-d7976d.netlify.app', 'https://fascinating-liger-1082c0.netlify.app', 'http://localhost:5173', 'https://fascinating-liger-1082c0.netlify.app'];
 
 const corsOptions = {
     origin: function (origin, callback) {
@@ -48,7 +48,7 @@ app.get('/', (req, res) => {
 import userRouter from './routes/user.routes.js';
 import authRouter from './routes/auth.routes.js';
 import visitorRouter from './routes/visitor.routes.js';
-import courseRouter from './routes/course.routes.js';;
+import courseRouter from './routes/course.routes.js';
 import universityRouter from './routes/university.routes.js';
 import newsRouter from './routes/news.routes.js';
 import jobRouter from './routes/job.routes.js';
