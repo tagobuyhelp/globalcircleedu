@@ -3,6 +3,7 @@ import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import errorMiddleware from './middleware/error.middleware.js';
 import http from 'http';
+import multer from 'multer';
 import { Server } from 'socket.io';
 
 const app = express();
@@ -16,7 +17,7 @@ const io = new Server(server, {
 });
 
 // CORS configuration
-const allowedOrigins = ['http://localhost:4000', 'https://globalcircleedu.tagobuy.site', 'https://unrivaled-genie-d7976d.netlify.app', 'https://fascinating-liger-1082c0.netlify.app', 'http://localhost:5173', 'https://fascinating-liger-1082c0.netlify.app'];
+const allowedOrigins = ['http://localhost:4000', 'https://globalcircleedu.tagobuy.site', 'https://effulgent-pothos-8ec801.netlify.app', 'https://fascinating-liger-1082c0.netlify.app', 'http://localhost:5173', 'https://fascinating-liger-1082c0.netlify.app'];
 
 const corsOptions = {
     origin: function (origin, callback) {
@@ -39,6 +40,9 @@ app.use(express.static("public"));
 app.use('/images', express.static('images'));
 app.use('/images/photos', express.static('images/photos'));
 app.use(cookieParser());
+
+const upload = multer();
+app.use(upload.any());
 
 app.get('/', (req, res) => {
     res.send('Welcome to Global Circle Edu Server');

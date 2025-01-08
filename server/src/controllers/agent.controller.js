@@ -152,6 +152,60 @@ export const getWithdrawalRequests = asyncHandler(async (req, res) => {
     res.status(200).json({ success: true, withdrawalRequests });
 });
 
+export const createAgent = asyncHandler(async (req, res) => {
+    const { name, email, phone } = req.body;
+
+    // Check if user already exists
+    let user = await User.findOne({ email });
+    if (!user) {
+        // If user doesn't exist, create a new user
+        user = new User({
+            name,
+            email,
+            phone,
+            role: 'agent'
+        });
+        await user.save();
+    } else if (user.role !== 'agent') {
+        // If user exists but is not an agent, update their role
+        user.role = 'agent';
+        await user.save();
+    }
+
+    // Check if agent already exists
+    let agent = await Agent.findOne({ email });
+    if (agent) {
+        throw new ApiError(400, "Agent already exists with this email");
+    }
+
+    // Create new agent
+    agent = new Agent({
+        name,
+        email,
+        phone,
+        user: user._id,
+        totalBalance: 0,
+        commissionEarned: 0,
+        totalEarned: 0,
+        availableBalance: 0,
+        paymentMethod: 'bank_transfer', // default payment method
+        paymentDetails: {}
+    });
+
+    await agent.save();
+
+    res.status(201).json({
+        success: true,
+        message: "Agent created successfully",
+        agent: {
+            id: agent._id,
+            name: agent.name,
+            email: agent.email,
+            phone: agent.phone
+        }
+    });
+});
+
 export const updatePaymentMethod = asyncHandler(async (req, res) => {
     const email = req.user.email;
 

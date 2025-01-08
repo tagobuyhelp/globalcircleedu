@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 
 const visitorSchema = new mongoose.Schema(
     {
+        user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
         name: { type: String, required: true, trim: true },
         email: {
             type: String,
@@ -32,7 +33,11 @@ const visitorSchema = new mongoose.Schema(
             required: true,
             enum: ["Student", "Worker"],
         },
-        interestedCourse: { type: mongoose.Schema.Types.ObjectId, ref: "Course", required: true },
+        interestedCourse: { type: mongoose.Schema.Types.ObjectId, ref: "Course"},
+        interestedJob: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Job'
+        },
         country: { type: String, required: true },
         address: {
             street: { type: String },

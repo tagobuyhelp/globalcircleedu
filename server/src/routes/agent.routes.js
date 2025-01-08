@@ -8,10 +8,13 @@ import {
     getAgentStats,
     requestWithdrawal,
     getWithdrawalRequests,
-    updatePaymentMethod
+    updatePaymentMethod,
+    createAgent,
 } from '../controllers/agent.controller.js';
 
 const router = express.Router();
+
+router.post('/create', createAgent);
 
 // Protect all routes
 router.use(protect);

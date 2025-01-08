@@ -56,6 +56,7 @@ export const getAllVisitors = asyncHandler(async (req, res) => {
 
     const visitors = await Visitor.find(filter)
         .populate("interestedCourse")
+        .populate("interestedJob")
         .skip(skip)
         .limit(limit);
 
@@ -89,7 +90,10 @@ export const getAllVisitors = asyncHandler(async (req, res) => {
 // Get visitor by ID
 export const getVisitorById = asyncHandler(async (req, res) => {
     const visitorId = req.params.id;
-    const visitor = await Visitor.findById(visitorId).populate("interestedCourse");
+    const visitor = await Visitor.findById(visitorId)
+            .populate("interestedCourse")
+            .populate("interestedJob");
+
     if (!visitor) {
         throw new ApiError(404, "Visitor not found");
     }
@@ -114,14 +118,32 @@ export const getVisitorById = asyncHandler(async (req, res) => {
 
 
 // Update a visitor
+// Update a visitor
 export const updateVisitor = asyncHandler(async (req, res) => {
     const visitorId = req.params.id;
-    const updateData = req.body;
+    let updateData;
+
+    console.log("Content-Type:", req.get('Content-Type'));
+
+    if (req.is('multipart/form-data')) {
+        // Handle form-data
+        updateData = req.body;
+        console.log("Received form-data:", updateData);
+    } else {
+        // Handle JSON data
+        updateData = req.body;
+        console.log("Received JSON data:", JSON.stringify(updateData, null, 2));
+    }
+
+    console.log(updateData);
 
     // Find the existing visitor
     let visitor = await Visitor.findById(visitorId);
     if (!visitor) {
-        throw new ApiError(404, "Visitor not found");
+        visitor = await Visitor.findOne({user: visitorId});
+        if (!visitor) {
+            throw new ApiError(404, "Visitor not found");
+        }
     }
 
     // Handle profile picture update
@@ -145,10 +167,16 @@ export const updateVisitor = asyncHandler(async (req, res) => {
     });
 
     // Update the visitor
-    visitor = await Visitor.findByIdAndUpdate(visitorId, updateData, {
+    visitor = await Visitor.findByIdAndUpdate(visitor._id, updateData, {
         new: true,
         runValidators: true,
-    }).populate("interestedCourse");
+    })
+    .populate("interestedCourse")
+    .populate("interestedJob");
+
+    if (!visitor) {
+        throw new ApiError(404, "Visitor not found after update");
+    }
 
     // Add base URL to profile picture and documents for response
     const visitorObj = visitor.toObject();
