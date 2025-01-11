@@ -29,7 +29,9 @@ const agentSchema = new mongoose.Schema({
         amount: { type: Number, required: true },
         status: { type: String, enum: ["Pending", "Approved", "Declined"], default: "Pending" },
         requestedAt: { type: Date, default: Date.now }
-    }]
+    }],
+    // Add this field to the agentSchema
+    visitors: [{ type: mongoose.Schema.Types.ObjectId, ref: "Visitor" }],
 }, { timestamps: true });
 
 export const Agent = mongoose.model("Agent", agentSchema);

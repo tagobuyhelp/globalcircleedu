@@ -4,6 +4,7 @@ const applicationSchema = new mongoose.Schema({
     agentId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Agent',
+        required: true
     },
     visitorId: {
         type: mongoose.Schema.Types.ObjectId,
@@ -51,12 +52,7 @@ const applicationSchema = new mongoose.Schema({
     adminNotes: {
         type: String,
         default: ''
-    },
-    createdBy: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
-        required: true
     }
 }, { timestamps: true });
 
-export const Application = mongoose.model('Application', applicationSchema);
+export const Application = mongoose.model("Application", applicationSchema);

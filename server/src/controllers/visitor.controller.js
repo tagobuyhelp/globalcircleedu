@@ -90,13 +90,20 @@ export const getAllVisitors = asyncHandler(async (req, res) => {
 // Get visitor by ID
 export const getVisitorById = asyncHandler(async (req, res) => {
     const visitorId = req.params.id;
-    const visitor = await Visitor.findById(visitorId)
-            .populate("interestedCourse")
-            .populate("interestedJob");
 
+    // Find the existing visitor
+    let visitor = await Visitor.findById(visitorId)
+    .populate("interestedCourse")
+    .populate("interestedJob");
     if (!visitor) {
-        throw new ApiError(404, "Visitor not found");
+        visitor = await Visitor.findOne({user: visitorId})
+        .populate("interestedCourse")
+        .populate("interestedJob");
+        if (!visitor) {
+            throw new ApiError(404, "Visitor not found");
+        }
     }
+    
 
     // Add base URL to profile picture and documents
     const visitorObj = visitor.toObject();
@@ -117,13 +124,12 @@ export const getVisitorById = asyncHandler(async (req, res) => {
 });
 
 
-// Update a visitor
+
 // Update a visitor
 export const updateVisitor = asyncHandler(async (req, res) => {
     const visitorId = req.params.id;
     let updateData;
 
-    console.log("Content-Type:", req.get('Content-Type'));
 
     if (req.is('multipart/form-data')) {
         // Handle form-data
@@ -135,7 +141,6 @@ export const updateVisitor = asyncHandler(async (req, res) => {
         console.log("Received JSON data:", JSON.stringify(updateData, null, 2));
     }
 
-    console.log(updateData);
 
     // Find the existing visitor
     let visitor = await Visitor.findById(visitorId);

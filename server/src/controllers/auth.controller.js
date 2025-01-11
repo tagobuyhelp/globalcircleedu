@@ -6,10 +6,12 @@ import { ApiError } from '../utils/apiError.js';
 import { ApiResponse } from '../utils/apiResponse.js';
 import crypto from 'crypto';
 import sendEmail from '../utils/sendEmail.js';
+import mongoose from 'mongoose';
 
 // Register user
 export const register = asyncHandler(async (req, res) => {
     const { email, password, role, phone, name } = req.body;
+    console.log(email, password, role, phone, name);
 
     // Define allowed roles
     const allowedRoles = ['administrator', 'admin', 'editor', 'visitor', 'agent'];
@@ -42,30 +44,52 @@ export const register = asyncHandler(async (req, res) => {
         }
     }
 
-    const user = await User.create({
-        name,
-        email,
-        password,
-        role,
-        phone
-    });
-
     // If the role is 'visitor' or 'agent', create the corresponding entry
-    if (role === 'visitor') {
-        await Visitor.create({
-            name,
-            email,
-            phone,
-        });
-    } else if (role === 'agent') {
-        await Agent.create({
-            name,
-            email,
-            phone,
-        });
-    }
+    // Start a transaction
+    const session = await mongoose.startSession();
+    session.startTransaction();
 
-    sendTokenResponse(user, 201, res);
+    try {
+        // Create user
+        const user = await User.create([{
+            name,
+            email,
+            password,
+            role,
+            phone
+        }], { session });
+
+        // If the role is 'visitor', create the corresponding Visitor entry
+        if (role === 'visitor') {
+            await Visitor.create([{
+                user: user[0]._id,
+                name,
+                email,
+                phone,
+            }], { session });
+        } else if (role === 'agent') {
+            await Agent.create([{
+                user: user[0]._id,
+                name,
+                email,
+                phone,
+            }], { session });
+        }
+
+        // Commit the transaction
+        await session.commitTransaction();
+
+        // End the session
+        session.endSession();
+
+        // Send token response
+        sendTokenResponse(user[0], 201, res);
+    } catch (error) {
+        // If an error occurs, abort the transaction
+        await session.abortTransaction();
+        session.endSession();
+        throw error;
+    }
 });
 
 // Login user

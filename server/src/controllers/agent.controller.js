@@ -1,22 +1,79 @@
 import { Agent } from "../models/agent.model.js";
 import { User } from "../models/user.model.js";
+import { Visitor } from "../models/visitor.model.js";
 import { Application } from "../models/application.model.js";
 import { WithdrawalRequest } from "../models/withdrawalRequest.model.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/apiError.js";
 
-// Create a new application
-export const createApplication = asyncHandler(async (req, res) => {
-    const { visitorId, serviceId } = req.body;
+export const createVisitor = asyncHandler(async (req, res) => {
     const agentId = req.user._id; // Assuming the agent is authenticated
+    const visitorData = req.body;
+
+    const visitor = new Visitor({
+        ...visitorData,
+        createdBy: agentId
+    });
+
+    await visitor.save();
+
+    // Update the agent's visitors array
+    await Agent.findOneAndUpdate({user: agentId}, { $push: { visitors: visitor._id } });
+
+
+    res.status(201).json({ success: true, visitor });
+});
+
+export const getAgentVisitors = asyncHandler(async (req, res) => {
+    const agentUserId = req.user._id;
+    const agentId = await Agent.findOne({ user: agentUserId })._id;
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+
+    const visitors = await Visitor.find({ createdBy: agentId })
+        .skip((page - 1) * limit)
+        .limit(limit);
+
+    const total = await Visitor.countDocuments({ createdBy: agentId });
+
+    res.json({
+        success: true,
+        visitors,
+        currentPage: page,
+        totalPages: Math.ceil(total / limit),
+        total
+    });
+});
+
+export const createApplication = asyncHandler(async (req, res) => {
+    const { visitorId, services } = req.body;
+    const agentUserId = req.user._id;
+
+    // Input validation
+    if (!visitorId || !services || !Array.isArray(services) || services.length === 0) {
+        throw new ApiError(400, "Invalid input: visitorId and services array are required");
+    }
+
+    const agent = await Agent.findOne({ user: agentUserId });
+    if (!agent) {
+        throw new ApiError(404, "Agent not found");
+    }
+
+    const visitor = await Visitor.findOne({ _id: visitorId, createdBy: agent._id });
+    if (!visitor) {
+        throw new ApiError(404, "Visitor not found or not created by this agent");
+    }
 
     const application = new Application({
-        agentId,
+        agentId: agent._id,
         visitorId,
-        serviceId,
-        status: 'Pending',
-        paymentStatus: 'Pending',
-        commissionAmount: 0 // This will be calculated later
+        services: services.map(service => ({
+            serviceId: service.serviceId,
+            status: 'Pending',
+            paymentStatus: 'Pending',
+            amountPaid: 0,
+            commissionAmount: 0
+        }))
     });
 
     await application.save();
@@ -24,20 +81,56 @@ export const createApplication = asyncHandler(async (req, res) => {
     res.status(201).json({ success: true, application });
 });
 
-// Get all applications for an agent
 export const getAgentApplications = asyncHandler(async (req, res) => {
-    const agentId = req.user._id; // Assuming the agent is authenticated
-    const applications = await Application.find({ agentId })
-        .populate('visitorId', 'name email')
-        .populate('serviceId', 'name');
+    const agentUserId = req.user._id;
+    const agentId = await Agent.findOne({ user: agentUserId })._id;
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
 
-    res.status(200).json({ success: true, count: applications.length, applications });
+    const applications = await Application.find({ agentId })
+        .populate('visitorId')
+        .populate('services.serviceId')
+        .skip((page - 1) * limit)
+        .limit(limit);
+
+    const total = await Application.countDocuments({ agentId });
+
+    res.json({
+        success: true,
+        applications,
+        currentPage: page,
+        totalPages: Math.ceil(total / limit),
+        total
+    });
 });
+
+export const updateVisitor = asyncHandler(async (req, res) => {
+    const { visitorId } = req.params;
+    const agentUserId = req.user._id;
+    const agentId = await Agent.findOne({ user: agentUserId })._id;
+
+    const updateData = req.body;
+
+    const visitor = await Visitor.findOneAndUpdate(
+        { _id: visitorId, createdBy: agentId },
+        updateData,
+        { new: true }
+    );
+
+    if (!visitor) {
+        throw new ApiError(404, "Visitor not found or not created by this agent");
+    }
+
+    res.json({ success: true, visitor });
+});
+
+
 
 // Get application details
 export const getApplicationDetails = asyncHandler(async (req, res) => {
     const { id } = req.params;
-    const agentId = req.user._id; // Assuming the agent is authenticated
+    const agentUserId = req.user._id; // Assuming the agent is authenticated
+    const agentId = await Agent.findOne({ user: agentUserId })._id;
 
     const application = await Application.findOne({ _id: id, agentId })
         .populate('visitorId', 'name email')
@@ -53,7 +146,8 @@ export const getApplicationDetails = asyncHandler(async (req, res) => {
 // Update application (limited fields)
 export const updateApplication = asyncHandler(async (req, res) => {
     const { id } = req.params;
-    const agentId = req.user._id; // Assuming the agent is authenticated
+    const agentUserId = req.user._id; // Assuming the agent is authenticated
+    const agentId = await Agent.findOne({ user: agentUserId })._id;
     const { status } = req.body;
 
     const application = await Application.findOneAndUpdate(
@@ -86,7 +180,7 @@ export const getAgentStats = asyncHandler(async (req, res) => {
             throw new ApiError(404, "User not found");
         }
 
-        const agent = await Agent.findOne({ email: user.email });
+        const agent = await Agent.findOne({ user: userId });
         if (!agent) {
             console.error('Agent not found for email:', user.email);
             throw new ApiError(404, "Agent not found");
@@ -120,7 +214,8 @@ export const getAgentStats = asyncHandler(async (req, res) => {
 });
 
 export const requestWithdrawal = asyncHandler(async (req, res) => {
-    const agentId = req.user._id;
+    const agentUserId = req.user._id;
+    const agentId = await Agent.findOne({ user: agentUserId })._id;
     const { amount } = req.body;
 
     const agent = await Agent.findById(agentId);
@@ -144,9 +239,9 @@ export const requestWithdrawal = asyncHandler(async (req, res) => {
 });
 
 export const getWithdrawalRequests = asyncHandler(async (req, res) => {
-    const email = req.user.email;
+    const agentUserId = req.user._id;
 
-    const agentId = await Agent.findOne({ email })._id;
+    const agentId = await Agent.findOne({ user: agentUserId })._id;
 
     const withdrawalRequests = await WithdrawalRequest.find({ agent: agentId });
     res.status(200).json({ success: true, withdrawalRequests });
@@ -207,12 +302,12 @@ export const createAgent = asyncHandler(async (req, res) => {
 });
 
 export const updatePaymentMethod = asyncHandler(async (req, res) => {
-    const email = req.user.email;
+    const agentUserId = req.user._id;
 
     const { paymentMethod, paymentDetails } = req.body;
 
     const agent = await Agent.findOneAndUpdate(
-        {email: email},
+        {user: agentUserId  },
         { paymentMethod, paymentDetails },
         { new: true, runValidators: true }
     );

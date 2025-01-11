@@ -26,7 +26,7 @@ router.post('/create', uploadPhotos, createVisitor);
 router.use(protect);
 
 router.route('/')
-    .get(authorize('editor', 'admin', 'administrator'), (req, res, next) => {
+    .get(authorize('editor', 'admin', 'administrator', 'visitor'), (req, res, next) => {
         console.log('Accessing getAllVisitors route');
         getAllVisitors(req, res, next);
     });
@@ -38,8 +38,8 @@ router.route('/stats')
     });
 
 router.route('/:id')
-    .get(authorize('editor', 'admin', 'administrator'), getVisitorById)
-    .put(authorize('editor', 'admin', 'administrator'), updateVisitor)
+    .get(authorize('editor', 'admin', 'administrator', 'visitor'), getVisitorById)
+    .put(authorize('editor', 'admin', 'administrator', 'visitor'), updateVisitor)
     .delete(authorize('admin', 'administrator'), deleteVisitor);
 
 router.route('/bulk')

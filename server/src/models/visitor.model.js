@@ -30,7 +30,6 @@ const visitorSchema = new mongoose.Schema(
         whatsapp: { type: String, default: "" },
         visitorType: {
             type: String,
-            required: true,
             enum: ["Student", "Worker"],
         },
         interestedCourse: { type: mongoose.Schema.Types.ObjectId, ref: "Course"},
@@ -38,7 +37,7 @@ const visitorSchema = new mongoose.Schema(
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Job'
         },
-        country: { type: String, required: true },
+        country: { type: String },
         address: {
             street: { type: String },
             city: { type: String },
@@ -49,7 +48,6 @@ const visitorSchema = new mongoose.Schema(
             level: {
                 type: String,
                 enum: ["Intermediate", "Bachelor", "Masters"],
-                required: true,
             },
             institution: { type: String }, // Name of the institution
             fieldOfStudy: { type: String }, // Discipline/Field
@@ -99,6 +97,8 @@ const visitorSchema = new mongoose.Schema(
         notes: { type: String }, // Internal notes
         preferredConsultationDate: { type: Date },
         referralSource: { type: String }, // E.g., Google, Social Media
+        // Add this field to the visitorSchema
+        createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "Agent" },
     },
     { timestamps: true }
 );
