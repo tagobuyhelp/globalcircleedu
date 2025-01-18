@@ -5,6 +5,8 @@ import errorMiddleware from './middleware/error.middleware.js';
 import http from 'http';
 import multer from 'multer';
 import { Server } from 'socket.io';
+import uploadRoutes from './routes/uploadRoutes.js';
+
 
 const app = express();
 const server = http.createServer(app);
@@ -40,6 +42,7 @@ app.use(express.static("public"));
 app.use('/images', express.static('images'));
 app.use('/images/photos', express.static('images/photos'));
 app.use(cookieParser());
+app.use('/', uploadRoutes);
 
 const upload = multer();
 app.use(upload.any());
@@ -49,6 +52,7 @@ app.get('/', (req, res) => {
 });
 
 // Import routes
+import settingsRoutes from './routes/settings.routes.js';
 import userRouter from './routes/user.routes.js';
 import authRouter from './routes/auth.routes.js';
 import visitorRouter from './routes/visitor.routes.js';
@@ -65,6 +69,9 @@ import agentRoutes from './routes/agent.routes.js';
 import chatRoutes from './routes/chat.routes.js';
 import paymentRoutes from './routes/payment.routes.js';
 import billingRoutes from './routes/billing.routes.js';
+import testimonialRoutes from './routes/testimonial.routes.js';
+import teamMemberRoutes from './routes/teamMember.routes.js';
+
 
 // Route declaration
 app.use("/users", userRouter);
@@ -84,6 +91,11 @@ app.use("/agent", agentRoutes);
 app.use("/chat", chatRoutes);
 app.use("/payment", paymentRoutes);
 app.use("/billing", billingRoutes);
+app.use('/settings', settingsRoutes);
+app.use('/testimonials', testimonialRoutes);
+app.use('/team-members', teamMemberRoutes);
+
+
 
 // Add this route before the catch-all handler
 app.get('/:filename', (req, res) => {

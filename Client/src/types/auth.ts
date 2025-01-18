@@ -29,4 +29,4 @@ export interface AuthError {
   errors?: Record<string, string[]>;
 }
 
-export type UserRole = 'user' | 'admin' | 'agent';
+export type UserRole = 'admin' | 'administrator' | 'agent' | 'visitor';

@@ -6,8 +6,9 @@ import { News } from '../models/news.model.js';
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/apiError.js";
 import { ApiResponse } from "../utils/apiResponse.js";
-import { getPhotoPath } from '../middleware/photoUpload.middleware.js';
-const BASE_URL = process.env.BASE_URL || "http://localhost:5000";
+import { cloudinaryUpload } from "../utils/cloudinaryUpload.js";
+import { notifyAdmins, notifyUser } from '../utils/sendEmail.js';
+
 
 // Create a new visitor
 export const createVisitor = asyncHandler(async (req, res) => {
@@ -18,24 +19,39 @@ export const createVisitor = asyncHandler(async (req, res) => {
         // Handle profile picture
         if (req.files && req.files.profilePicture) {
             const profilePicture = req.files.profilePicture[0];
-            visitorData.profilePicture = getPhotoPath(profilePicture.filename);
+            const result = await cloudinaryUpload(profilePicture);
+            visitorData.profilePicture = result.secure_url;
         }
 
         // Handle document uploads
         const documentFields = ['identityDocument', 'transcript', 'workExperience', 'languageTests'];
-        documentFields.forEach(field => {
+        for (const field of documentFields) {
             if (req.files && req.files[field]) {
                 const file = req.files[field][0];
+                const result = await cloudinaryUpload(file);
                 visitorData.documents[field] = {
                     name: file.originalname,
-                    fileURL: getPhotoPath(file.filename),
+                    fileURL: result.secure_url,
                     documentType: file.mimetype,
                 };
             }
-        });
+        }
 
         // Save visitor data
         const visitor = await Visitor.create(visitorData);
+
+        await notifyAdmins(
+            'New Visitor Registration',
+            `A new visitor has registered: ${visitor.name} (${visitor.email})`,
+            `<h1>New Visitor Registration</h1><p>A new visitor has registered:</p><p><strong>Name:</strong> ${visitor.name}</p><p><strong>Email:</strong> ${visitor.email}</p>`
+        );
+        
+        await notifyUser(
+            visitor.email,
+            'Welcome to Global Circle Edu',
+            `Dear ${visitor.name},\n\nThank you for registering with Global Circle Edu. We're excited to have you on board!`,
+            `<h1>Welcome to Global Circle Edu</h1><p>Dear ${visitor.name},</p><p>Thank you for registering with Global Circle Edu. We're excited to have you on board!</p>`
+        );
 
         res.status(201).json(new ApiResponse(201, visitor, "Visitor created successfully"));
     } catch (error) {
@@ -62,21 +78,7 @@ export const getAllVisitors = asyncHandler(async (req, res) => {
 
     const total = await Visitor.countDocuments(filter);
 
-    // Add base URL to profile pictures and documents
-    const visitorsWithFullUrls = visitors.map(visitor => {
-        const visitorObj = visitor.toObject();
-        if (visitorObj.profilePicture) {
-            visitorObj.profilePicture = `${BASE_URL}/${visitorObj.profilePicture}`;
-        }
-        if (visitorObj.documents) {
-            Object.keys(visitorObj.documents).forEach(docType => {
-                if (visitorObj.documents[docType].fileURL) {
-                    visitorObj.documents[docType].fileURL = `${BASE_URL}/${visitorObj.documents[docType].fileURL}`;
-                }
-            });
-        }
-        return visitorObj;
-    });
+    
 
     res.status(200).json(new ApiResponse(200, {
         visitors: visitorsWithFullUrls,
@@ -93,34 +95,18 @@ export const getVisitorById = asyncHandler(async (req, res) => {
 
     // Find the existing visitor
     let visitor = await Visitor.findById(visitorId)
-    .populate("interestedCourse")
-    .populate("interestedJob");
-    if (!visitor) {
-        visitor = await Visitor.findOne({user: visitorId})
         .populate("interestedCourse")
         .populate("interestedJob");
+    if (!visitor) {
+        visitor = await Visitor.findOne({user: visitorId})
+            .populate("interestedCourse")
+            .populate("interestedJob");
         if (!visitor) {
             throw new ApiError(404, "Visitor not found");
         }
     }
-    
 
-    // Add base URL to profile picture and documents
-    const visitorObj = visitor.toObject();
-
-    if (visitorObj.profilePicture) {
-        visitorObj.profilePicture = `${BASE_URL}/${visitorObj.profilePicture}`;
-    }
-
-    if (visitorObj.documents) {
-        Object.keys(visitorObj.documents).forEach(docType => {
-            if (visitorObj.documents[docType].fileURL) {
-                visitorObj.documents[docType].fileURL = `${BASE_URL}/${visitorObj.documents[docType].fileURL}`;
-            }
-        });
-    }
-
-    res.status(200).json(new ApiResponse(200, visitorObj, "Visitor fetched successfully"));
+    res.status(200).json(new ApiResponse(200, visitor, "Visitor fetched successfully"));
 });
 
 
@@ -154,22 +140,25 @@ export const updateVisitor = asyncHandler(async (req, res) => {
     // Handle profile picture update
     if (req.files && req.files.profilePicture) {
         const profilePicture = req.files.profilePicture[0];
-        updateData.profilePicture = getPhotoPath(profilePicture.filename);
+        const result = await cloudinaryUpload(profilePicture);
+        updateData.profilePicture = result.secure_url;
     }
+
 
     // Handle document updates
     const documentFields = ['identityDocument', 'transcript', 'workExperience', 'languageTests'];
-    documentFields.forEach(field => {
+    for (const field of documentFields) {
         if (req.files && req.files[field]) {
             const file = req.files[field][0];
+            const result = await cloudinaryUpload(file);
             if (!updateData.documents) updateData.documents = {};
             updateData.documents[field] = {
                 name: file.originalname,
-                fileURL: getPhotoPath(file.filename),
+                fileURL: result.secure_url,
                 documentType: file.mimetype,
             };
         }
-    });
+    }
 
     // Update the visitor
     visitor = await Visitor.findByIdAndUpdate(visitor._id, updateData, {

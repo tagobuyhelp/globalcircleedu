@@ -16,25 +16,27 @@ export const UniversityPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchUniversity = async () => {
-      try {
-        if (!id) {
-          setError('University not found');
-          return;
-        }
-        const response = await universityApi.getById(id);
-        setUniversity(response.data);
-      } catch (err) {
-        console.error('Error fetching university:', err);
-        setError('Failed to load university details');
-      } finally {
-        setLoading(false);
+ useEffect(() => {
+  const fetchUniversity = async () => {
+    try {
+      if (!id) {
+        setError('University ID is missing');
+        return;
       }
-    };
+      const response = await universityApi.getById(id);
+      
+      // The response includes the university data directly
+      setUniversity(response);
+    } catch (err: any) {
+      console.error('Error fetching university:', err);
+      setError(err?.response?.data?.message || 'Failed to load university details');
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    fetchUniversity();
-  }, [id]);
+  fetchUniversity();
+}, [id]);
 
   if (loading) return <LoadingSpinner message="Loading university details..." />;
   if (error || !university) {

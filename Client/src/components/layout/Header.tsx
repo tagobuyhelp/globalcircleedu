@@ -9,6 +9,24 @@ export const Header = () => {
   const { isDarkMode, toggleTheme } = useThemeStore();
   const { isAuthenticated, user, logout } = useAuthStore();
 
+  const getDashboardLink = () => {
+    if (!user) return '/dashboard';
+    
+    // Handle admin roles consistently
+    if (user.role === 'admin' || user.role === 'administrator') {
+      return '/dashboard/admin';
+    }
+    
+    switch (user.role) {
+      case 'agent':
+        return '/dashboard/agent';
+      case 'visitor':
+        return '/dashboard/visitor/profile';
+      default:
+        return '/dashboard/visitor/profile';
+    }
+  };
+
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-white dark:bg-gray-900">
       <div className="container mx-auto px-4">
@@ -43,10 +61,10 @@ export const Header = () => {
             {isAuthenticated ? (
               <div className="flex items-center space-x-4">
                 <Link
-                  to="/dashboard"
+                  to={getDashboardLink()}
                   className="text-gray-600 hover:text-blue-600 dark:text-gray-300"
                 >
-                  Dashboard
+                  {user?.role === 'visitor' ? 'My Profile' : 'Dashboard'}
                 </Link>
                 <button
                   onClick={logout}

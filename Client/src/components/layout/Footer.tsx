@@ -16,7 +16,7 @@ const socialLinks = [
 
 export const Footer = () => {
   return (
-    <footer className="bg-[#1f2021] text-white">
+    <footer className="bg-[#004e9a] text-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Company Info */}
@@ -94,6 +94,9 @@ export const Footer = () => {
               <li>
                 <Link to="/news" className="hover:text-[#f37021]">News</Link>
               </li>
+              <li>
+                <Link to="/services" className="hover:text-[#f37021]">Services</Link>
+              </li>
             </ul>
           </div>
 
@@ -112,6 +115,9 @@ export const Footer = () => {
               </li>
               <li>
                 <Link to="/study/australia" className="hover:text-[#f37021]">Australia</Link>
+              </li>
+              <li>
+                <Link to="/study/new-zealand" className="hover:text-[#f37021]">New Zealand</Link>
               </li>
             </ul>
           </div>

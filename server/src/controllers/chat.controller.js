@@ -1,5 +1,7 @@
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ChatMessage } from '../models/chatMessage.model.js';
+import { notifyAdmins } from '../utils/sendEmail.js';
+
 
 export const saveVisitorMessage = asyncHandler(async (req, res) => {
     const { message } = req.body;
@@ -13,6 +15,24 @@ export const saveVisitorMessage = asyncHandler(async (req, res) => {
     });
 
     await newMessage.populate('visitorId', 'name email');
+
+    // Notify admins about the new message
+    const subject = 'New Chat Message from Visitor';
+    const emailMessage = `A new message has been received from ${newMessage.visitorId.name} (${newMessage.visitorId.email}).`;
+    const html = `
+        <h1>New Chat Message</h1>
+        <p>${emailMessage}</p>
+        <p><strong>Message:</strong> "${message}"</p>
+        <p>Please log in to the admin panel to respond.</p>
+    `;
+
+    try {
+        await notifyAdmins(subject, emailMessage, html);
+        console.log('Admin notification sent successfully');
+    } catch (error) {
+        console.error('Failed to send admin notification:', error);
+        // Consider whether you want to throw an error here or just log it
+    }
 
     res.status(201).json({
         success: true,

@@ -8,21 +8,26 @@ const BASE_URL = process.env.BASE_URL || "http://localhost:5000";
 
 // Create News
 export const createNews = asyncHandler(async (req, res) => {
-    const newsData = req.body;
+    const { title, content, author } = req.body;
 
-    if (req.files && req.files.imageUrl) {
-        newsData.imageUrl = getPhotoPath(req.files.imageUrl[0].filename);
+    if (!title || !content) {
+        throw new ApiError(400, "Title and content are required");
     }
 
-    const news = await News.create(newsData);
-
-    // Add base URL to imageUrl for response
-    const newsObj = news.toObject();
-    if (newsObj.imageUrl) {
-        newsObj.imageUrl = `${BASE_URL}/${newsObj.imageUrl}`;
+    let imageUrl;
+    if (req.file) {
+        const result = await cloudinaryUpload(req.file);
+        imageUrl = result.url;
     }
 
-    res.status(201).json(new ApiResponse(201, newsObj, "News created successfully"));
+    const news = await News.create({
+        title,
+        content,
+        author,
+        imageUrl
+    });
+
+    res.status(201).json(new ApiResponse(201, news, "News created successfully"));
 });
 
 export const getAllNews = asyncHandler(async (req, res) => {
@@ -32,18 +37,9 @@ export const getAllNews = asyncHandler(async (req, res) => {
 
     const total = await News.countDocuments();
     const newsList = await News.find()
-        .sort({ publishedAt: -1 }) // Sort by publishedAt in descending order
+        .sort({ publishedAt: -1 })
         .skip(startIndex)
         .limit(limit);
-
-    // Add base URL to imageUrl
-    const newsListWithFullUrls = newsList.map(news => {
-        const newsObj = news.toObject();
-        if (newsObj.imageUrl) {
-            newsObj.imageUrl = `${BASE_URL}/${newsObj.imageUrl}`;
-        }
-        return newsObj;
-    });
 
     const pagination = {
         currentPage: page,
@@ -53,10 +49,11 @@ export const getAllNews = asyncHandler(async (req, res) => {
     };
 
     res.status(200).json(new ApiResponse(200, {
-        news: newsListWithFullUrls,
+        news: newsList,
         pagination
     }, "News fetched successfully"));
 });
+
 
 // Get Related News
 export const getRelatedNews = asyncHandler(async (req, res) => {
@@ -67,65 +64,59 @@ export const getRelatedNews = asyncHandler(async (req, res) => {
         throw new ApiError(404, "News not found");
     }
 
-    // Find news with the same category, excluding the current news
     const relatedNews = await News.find({
         _id: { $ne: id },
         category: { $in: currentNews.category }
     })
+    .sort({ publishedAt: -1 }) // Sort by most recent first
     .limit(3) // Limit to 3 related news items
     .select('title content category publishedAt imageUrl'); // Select only necessary fields
 
-    // Add base URL to imageUrl for each related news item
-    const relatedNewsWithFullUrls = relatedNews.map(news => {
+    // Process the related news items
+    const relatedNewsProcessed = relatedNews.map(news => {
         const newsObj = news.toObject();
-        if (newsObj.imageUrl) {
-            newsObj.imageUrl = `${BASE_URL}/${newsObj.imageUrl}`;
-        }
+        // Add a truncated version of the content for preview
+        newsObj.contentPreview = newsObj.content.substring(0, 100) + '...';
         return newsObj;
     });
 
-    res.status(200).json(new ApiResponse(200, relatedNewsWithFullUrls, "Related news fetched successfully"));
+    res.status(200).json(new ApiResponse(200, relatedNewsProcessed, "Related news fetched successfully"));
 });
+
+
 // Get News by ID
 export const getNewsById = asyncHandler(async (req, res) => {
-    const newsId = req.params.id;
-    const news = await News.findById(newsId);
+    const news = await News.findById(req.params.id);
 
     if (!news) {
         throw new ApiError(404, "News not found");
     }
 
-    // Add base URL to imageUrl
-    const newsObj = news.toObject();
-    if (newsObj.imageUrl) {
-        newsObj.imageUrl = `${BASE_URL}/${newsObj.imageUrl}`;
-    }
-
-    res.status(200).json(new ApiResponse(200, newsObj, "News fetched successfully"));
+    res.status(200).json(new ApiResponse(200, news, "News fetched successfully"));
 });
 
 // Update News
 export const updateNews = asyncHandler(async (req, res) => {
-    const newsId = req.params.id;
-    const updateData = req.body;
-
-    if (req.files && req.files.imageUrl) {
-        updateData.imageUrl = getPhotoPath(req.files.imageUrl[0].filename);
-    }
-
-    const news = await News.findByIdAndUpdate(newsId, updateData, { new: true, runValidators: true });
+    let news = await News.findById(req.params.id);
 
     if (!news) {
         throw new ApiError(404, "News not found");
     }
 
-    // Add base URL to imageUrl for response
-    const newsObj = news.toObject();
-    if (newsObj.imageUrl) {
-        newsObj.imageUrl = `${BASE_URL}/${newsObj.imageUrl}`;
+    const { title, content, author } = req.body;
+
+    if (req.file) {
+        const result = await cloudinaryUpload(req.file);
+        news.imageUrl = result.url;
     }
 
-    res.status(200).json(new ApiResponse(200, newsObj, "News updated successfully"));
+    news.title = title || news.title;
+    news.content = content || news.content;
+    news.author = author || news.author;
+
+    news = await news.save();
+
+    res.status(200).json(new ApiResponse(200, news, "News updated successfully"));
 });
 
 // Delete News

@@ -33,7 +33,7 @@ export const authApi = {
       email: userData.email,
       password: userData.password,
       phone: userData.phone,
-      role: userData.role === 'agent' ? 'agent' : 'user'
+      role: userData.role === 'agent' ? 'agent' : 'visitor'
     });
     if (data.success) {
       return data.data;

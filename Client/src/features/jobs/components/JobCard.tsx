@@ -1,6 +1,10 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card } from '../../../components/ui/Card';
 import { Button } from '../../../components/ui/Button';
+import { useAuthStore } from '../../../store/authStore';
+import { visitorApi } from '../../../features/visitors/api/visitorApi';
+import toast from 'react-hot-toast';
 import { MapPin, Building2, DollarSign } from 'lucide-react';
 import type { Job } from '../types';
 
@@ -10,6 +14,33 @@ interface JobCardProps {
 }
 
 export const JobCard: React.FC<JobCardProps> = ({ job, onApply }) => {
+  const navigate = useNavigate();
+  const { isAuthenticated, user } = useAuthStore();
+
+  const handleApply = async () => {
+  if (!isAuthenticated) {
+    toast.error('Please login to apply for this job');
+    navigate('/login', { 
+      state: { from: `/jobs/${job._id}` }
+    });
+    return;
+  }
+
+  try {
+    // Create FormData instance
+    const formData = new FormData();
+    formData.append('interestedJob', job._id);
+
+    await visitorApi.update(user.id, formData);
+    onApply?.(job._id);
+    toast.success('Successfully applied for job!');
+  } catch (error) {
+    console.error('Error applying for job:', error);
+    toast.error('Failed to apply for job. Please try again.');
+  }
+};
+
+
   return (
     <Card className="p-6">
       <div className="flex justify-between items-start">
@@ -30,7 +61,7 @@ export const JobCard: React.FC<JobCardProps> = ({ job, onApply }) => {
             </div>
           </div>
         </div>
-        <Button onClick={() => onApply?.(job.id)}>Apply Now</Button>
+        <Button onClick={handleApply}>Apply Now</Button>
       </div>
       
       <p className="mt-4 text-gray-600 dark:text-gray-400">{job.description}</p>

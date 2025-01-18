@@ -58,10 +58,13 @@ export const JobsPage = () => {
     const matchesCountry = filters.country.length === 0 || 
                           filters.country.includes(job.country);
     
-    // Add more filter conditions as needed
-
     return matchesSearch && matchesType && matchesCountry;
   });
+
+  const handleApply = async (jobId: string) => {
+    // The actual apply logic is handled in the JobGrid component
+    console.log('Job application submitted:', jobId);
+  };
 
   if (loading) return <LoadingSpinner message="Loading jobs..." />;
   if (error) return <div className="text-red-600">{error}</div>;
@@ -107,7 +110,7 @@ export const JobsPage = () => {
               jobs={filteredJobs}
               view={view}
               onViewChange={toggleView}
-              onApply={(jobId) => console.log('Applying for job:', jobId)}
+              onApply={handleApply}
             />
           </div>
         </div>
@@ -125,4 +128,4 @@ export const JobsPage = () => {
       <Footer />
     </>
   );
-};
+}; 

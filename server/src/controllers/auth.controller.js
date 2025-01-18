@@ -5,7 +5,7 @@ import { asyncHandler } from '../utils/asyncHandler.js';
 import { ApiError } from '../utils/apiError.js';
 import { ApiResponse } from '../utils/apiResponse.js';
 import crypto from 'crypto';
-import sendEmail from '../utils/sendEmail.js';
+import { sendEmail } from '../utils/sendEmail.js';
 import mongoose from 'mongoose';
 
 // Register user
@@ -81,6 +81,13 @@ export const register = asyncHandler(async (req, res) => {
 
         // End the session
         session.endSession();
+
+        // Send welcome email
+        await sendEmail({
+            email: user[0].email,
+            subject: 'Welcome to Our Platform',
+            message: `Hello ${user[0].name}, welcome to our platform! Your account has been successfully created.`
+        });
 
         // Send token response
         sendTokenResponse(user[0], 201, res);

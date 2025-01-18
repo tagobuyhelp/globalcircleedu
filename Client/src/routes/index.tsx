@@ -1,8 +1,9 @@
 import React from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import { MainLayout } from '../components/layout/MainLayout';
 import { DashboardLayout } from '../components/layout/DashboardLayout';
 import { ProtectedRoute } from '../components/auth/ProtectedRoute';
+import { VisitorProfilePage } from '../pages/visitor/VisitorProfilePage';
 
 // Public pages
 import { Home } from '../pages/Home';
@@ -16,6 +17,7 @@ import { SingleNewsPage } from '../pages/public/SingleNewsPage';
 import { LoginPage } from '../pages/auth/LoginPage';
 import { RegisterPage } from '../pages/auth/RegisterPage';
 import { UnauthorizedPage } from '../pages/auth/UnauthorizedPage';
+import { CompleteProfilePage } from '../pages/auth/CompleteProfilePage';
 
 // Admin pages
 import { AdminDashboard } from '../pages/admin/AdminDashboard';
@@ -27,21 +29,13 @@ import { VisitorStats } from '../pages/admin/VisitorStats';
 
 // Agent pages
 import { AgentDashboard } from '../pages/agent/AgentDashboard';
-import { AgentVisitors } from '../pages/agent/AgentVisitors';
 import { AgentApplications } from '../pages/agent/AgentApplications';
 import { AgentEarnings } from '../pages/agent/AgentEarnings';
-
-// User pages
-import { UserDashboard } from '../pages/user/UserDashboard';
-import { UserCourses } from '../pages/user/UserCourses';
-import { UserUniversities } from '../pages/user/UserUniversities';
-import { UserJobs } from '../pages/user/UserJobs';
-import { UserApplications } from '../pages/user/UserApplications';
 
 export const AppRoutes = () => {
   return (
     <Routes>
-      {/* Public routes with MainLayout */}
+      {/* Public routes */}
       <Route element={<MainLayout />}>
         <Route path="/" element={<Home />} />
         <Route path="/courses" element={<CoursesPage />} />
@@ -53,6 +47,7 @@ export const AppRoutes = () => {
         <Route path="/news/:id" element={<SingleNewsPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
+        <Route path="/complete-profile" element={<CompleteProfilePage />} />
         <Route path="/unauthorized" element={<UnauthorizedPage />} />
       </Route>
 
@@ -61,39 +56,38 @@ export const AppRoutes = () => {
         path="/dashboard"
         element={
           <ProtectedRoute>
-            <DashboardLayout />
+            <Outlet />
           </ProtectedRoute>
         }
       >
-        {/* Admin routes */}
-        <Route path="admin">
-          <Route index element={<AdminDashboard />} />
-          <Route path="users" element={<AdminUsers />} />
-          <Route path="services" element={<AdminServices />} />
-          <Route path="universities" element={<AdminUniversities />} />
-          <Route path="applications" element={<AdminApplications />} />
-          <Route path="stats" element={<VisitorStats />} />
+        {/* Admin routes with sidebar */}
+        <Route element={<DashboardLayout />}>
+          <Route path="admin">
+            <Route index element={<AdminDashboard />} />
+            <Route path="users" element={<AdminUsers />} />
+            <Route path="services" element={<AdminServices />} />
+            <Route path="universities" element={<AdminUniversities />} />
+            <Route path="applications" element={<AdminApplications />} />
+            <Route path="stats" element={<VisitorStats />} />
+          </Route>
         </Route>
 
-        {/* Agent routes */}
-        <Route path="agent">
-          <Route index element={<AgentDashboard />} />
-          <Route path="visitors" element={<AgentVisitors />} />
-          <Route path="applications" element={<AgentApplications />} />
-          <Route path="earnings" element={<AgentEarnings />} />
+        {/* Agent routes with sidebar */}
+        <Route element={<DashboardLayout />}>
+          <Route path="agent">
+            <Route index element={<AgentDashboard />} />
+            <Route path="applications" element={<AgentApplications />} />
+            <Route path="earnings" element={<AgentEarnings />} />
+          </Route>
         </Route>
 
-        {/* User routes */}
-        <Route path="user">
-          <Route index element={<UserDashboard />} />
-          <Route path="courses" element={<UserCourses />} />
-          <Route path="universities" element={<UserUniversities />} />
-          <Route path="jobs" element={<UserJobs />} />
-          <Route path="applications" element={<UserApplications />} />
+        {/* Visitor routes without sidebar */}
+        <Route path="visitor">
+          <Route path="profile" element={<MainLayout><VisitorProfilePage /></MainLayout>} />
         </Route>
 
-        {/* Default redirect based on role */}
-        <Route index element={<Navigate to="user" replace />} />
+        {/* Default redirect */}
+        <Route index element={<Navigate to="visitor/profile" replace />} />
       </Route>
 
       {/* Catch all */}

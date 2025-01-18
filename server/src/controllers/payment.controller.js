@@ -3,6 +3,8 @@ import { Payment } from '../models/payment.model.js';
 import { Billing } from '../models/billing.model.js';
 import Stripe from 'stripe';
 import Razorpay from 'razorpay';
+import { notifyAdmins, notifyUser } from '../utils/sendEmail.js';
+import crypto from 'crypto';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 const razorpay = new Razorpay({
@@ -33,6 +35,9 @@ export const createPayment = asyncHandler(async (req, res) => {
             status: 'completed',
             service: serviceId
         });
+
+        await notifyPaymentParties(payment, 'Stripe', req.user.email);
+
     } else if (paymentMethod === 'razorpay') {
         const order = await razorpay.orders.create({
             amount: amount * 100, // Razorpay expects amount in paise
@@ -49,8 +54,10 @@ export const createPayment = asyncHandler(async (req, res) => {
             status: 'pending',
             service: serviceId
         });
+
+        await notifyPaymentParties(payment, 'Razorpay', req.user.email, true);
+
     } else if (paymentMethod === 'offline') {
-        // Handle offline payment
         payment = await Payment.create({
             user: userId,
             amount,
@@ -61,7 +68,6 @@ export const createPayment = asyncHandler(async (req, res) => {
             offlineDetails: offlineDetails || {}
         });
 
-        // Create a pending billing record
         await Billing.create({
             user: userId,
             service: serviceId,
@@ -70,6 +76,9 @@ export const createPayment = asyncHandler(async (req, res) => {
             status: 'pending',
             payment: payment._id
         });
+
+        await notifyPaymentParties(payment, 'Offline', req.user.email, true);
+
     } else {
         return res.status(400).json({
             success: false,
@@ -94,22 +103,22 @@ export const verifyRazorpayPayment = asyncHandler(async (req, res) => {
         .digest("hex");
 
     if (expectedSignature === razorpay_signature) {
-        await Payment.findOneAndUpdate(
+        const payment = await Payment.findOneAndUpdate(
             { razorpayOrderId: razorpay_order_id },
             { 
                 status: 'completed',
                 razorpayPaymentId: razorpay_payment_id,
                 transactionId: razorpay_payment_id
-            }
+            },
+            { new: true }
         );
 
-        const payment = await Payment.findOne({ razorpayOrderId: razorpay_order_id });
-
-        // Update the corresponding billing record
         await Billing.findOneAndUpdate(
             { user: payment.user, service: payment.service, status: 'pending' },
             { status: 'paid', payment: payment._id }
         );
+
+        await notifyPaymentParties(payment, 'Razorpay', req.user.email);
 
         res.status(200).json({
             success: true,
@@ -132,3 +141,28 @@ export const getPaymentHistory = asyncHandler(async (req, res) => {
         data: payments
     });
 });
+
+async function notifyPaymentParties(payment, paymentProvider, userEmail, isPending = false) {
+    const status = isPending ? 'initiated' : 'completed';
+    const adminSubject = `New ${paymentProvider} Payment ${status.charAt(0).toUpperCase() + status.slice(1)}`;
+    const adminMessage = `A new ${paymentProvider} payment of ${payment.currency} ${payment.amount} has been ${status} for service ${payment.service}.`;
+    const adminHtml = `
+        <h1>${adminSubject}</h1>
+        <p>${adminMessage}</p>
+        <p>Payment ID: ${payment._id}</p>
+        <p>User ID: ${payment.user}</p>
+        <p>Status: ${payment.status}</p>
+    `;
+    await notifyAdmins(adminSubject, adminMessage, adminHtml);
+
+    const userSubject = `Your ${paymentProvider} Payment Has Been ${status.charAt(0).toUpperCase() + status.slice(1)}`;
+    const userMessage = `Your ${paymentProvider} payment of ${payment.currency} ${payment.amount} has been ${status}.`;
+    const userHtml = `
+        <h1>${userSubject}</h1>
+        <p>${userMessage}</p>
+        <p>Payment ID: ${payment._id}</p>
+        <p>Amount: ${payment.currency} ${payment.amount}</p>
+        <p>Status: ${payment.status}</p>
+    `;
+    await notifyUser(userEmail, userSubject, userMessage, userHtml);
+}

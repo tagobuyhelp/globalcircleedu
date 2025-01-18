@@ -4,8 +4,8 @@ import { Program } from "../models/program.model.js";
 import { Course } from "../models/course.model.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/apiError.js";
-import { getPhotoPath } from "../middleware/photoUpload.middleware.js";
-const BASE_URL = process.env.BASE_URL || "http://localhost:5000";
+import { cloudinaryUpload } from "../utils/cloudinaryUpload.js";
+
 
 export const createUniversity = async (req, res) => {
     try {
@@ -13,12 +13,16 @@ export const createUniversity = async (req, res) => {
 
         if (req.files) {
             if (req.files.logo) {
-                universityData.logo = getPhotoPath(req.files.logo[0].filename);
+                const logoResult = await cloudinaryUpload(req.files.logo[0]);
+                universityData.logo = logoResult.url;
             }
             if (req.files.campusPhotos) {
-                universityData.campusPhotos = req.files.campusPhotos.map(file => getPhotoPath(file.filename));
+                const campusPhotoPromises = req.files.campusPhotos.map(file => cloudinaryUpload(file));
+                const campusPhotoResults = await Promise.all(campusPhotoPromises);
+                universityData.campusPhotos = campusPhotoResults.map(result => result.url);
             }
         }
+    
 
         const university = await University.create(universityData);
         res.status(201).json({ success: true, data: university });
@@ -35,17 +39,6 @@ export const getAllUniversities = asyncHandler(async (req, res) => {
     const totalUniversities = await University.countDocuments();
     const universities = await University.find().skip(skip).limit(limit);
 
-    // Add base URL to logo and campus photos
-    const universitiesWithFullUrls = universities.map(uni => {
-        const uniObj = uni.toObject();
-        if (uniObj.logo) {
-            uniObj.logo = `${BASE_URL}/${uniObj.logo}`;
-        }
-        if (uniObj.campusPhotos) {
-            uniObj.campusPhotos = uniObj.campusPhotos.map(photo => `${BASE_URL}/${photo}`);
-        }
-        return uniObj;
-    });
 
     const totalPages = Math.ceil(totalUniversities / limit);
 
@@ -73,14 +66,6 @@ export const getUniversityById = asyncHandler(async (req, res) => {
     const programIds = programs.map(program => program._id);
     const courses = await Course.find({ program: { $in: programIds } });
 
-    // Add base URL to logo and campus photos
-    const uniObj = university.toObject();
-    if (uniObj.logo) {
-        uniObj.logo = `${BASE_URL}/${uniObj.logo}`;
-    }
-    if (uniObj.campusPhotos) {
-        uniObj.campusPhotos = uniObj.campusPhotos.map(photo => `${BASE_URL}/${photo}`);
-    }
 
     // Add programs and courses to the university object
     uniObj.programs = programs.map(program => {
@@ -92,33 +77,32 @@ export const getUniversityById = asyncHandler(async (req, res) => {
     res.status(200).json(new ApiResponse(200, uniObj, "University fetched successfully"));
 });
 
-export const updateUniversity = async (req, res) => {
-    try {
-        const updateData = req.body;
+export const updateUniversity = asyncHandler(async (req, res) => {
+    const updateData = req.body;
 
-        if (req.files) {
-            if (req.files.logo) {
-                updateData.logo = getPhotoPath(req.files.logo[0].filename);
-            }
-            if (req.files.campusPhotos) {
-                updateData.campusPhotos = req.files.campusPhotos.map(file => getPhotoPath(file.filename));
-            }
+    if (req.files) {
+        if (req.files.logo) {
+            const logoResult = await uploadOnCloudinary(req.files.logo[0]);
+            updateData.logo = logoResult.url;
         }
-
-        const university = await University.findByIdAndUpdate(req.params.id, updateData, {
-            new: true,
-            runValidators: true
-        });
-
-        if (!university) {
-            return res.status(404).json({ success: false, error: 'University not found' });
+        if (req.files.campusPhotos) {
+            const campusPhotoPromises = req.files.campusPhotos.map(file => cloudinaryUpload(file));
+            const campusPhotoResults = await Promise.all(campusPhotoPromises);
+            updateData.campusPhotos = campusPhotoResults.map(result => result.url);
         }
-
-        res.status(200).json({ success: true, data: university });
-    } catch (error) {
-        res.status(400).json({ success: false, error: error.message });
     }
-};
+
+    const university = await University.findByIdAndUpdate(req.params.id, updateData, {
+        new: true,
+        runValidators: true
+    });
+
+    if (!university) {
+        throw new ApiError(404, "University not found");
+    }
+
+    res.status(200).json(new ApiResponse(200, university, "University updated successfully"));
+});
 
 
 export const deleteUniversity = asyncHandler(async (req, res) => {

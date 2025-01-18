@@ -1,4 +1,3 @@
-// Core visitor types
 export interface Address {
   street: string;
   city: string;
@@ -6,14 +5,8 @@ export interface Address {
   zipCode: string;
 }
 
-export interface EducationScore {
-  percentage: number;
-  gpa: number;
-}
-
 export interface Education {
-  score: EducationScore;
-  level: string;
+  level: 'Intermediate' | 'Bachelor' | 'Masters';
   institution: string;
   fieldOfStudy: string;
   degreeName: string;
@@ -21,6 +14,10 @@ export interface Education {
   modeOfStudy: string;
   mediumOfEducation: string;
   division: string;
+  score: {
+    percentage: number;
+    gpa: number;
+  };
   yearOfReceiving: number;
 }
 
@@ -44,26 +41,28 @@ export interface Documents {
 }
 
 export interface Visitor {
-  id: string;
+  _id: string;
+  user: string; // User ID reference
   name: string;
   email: string;
   phone: string;
   whatsapp: string;
   visitorType: 'Student' | 'Worker';
-  interestedCourse: any | null; // Replace 'any' with proper Course type
+  interestedCourse?: string; // Course ID reference
+  interestedJob?: string; // Job ID reference
   country: string;
+  address: Address;
+  education: Education;
+  professional: Professional;
+  documents: Documents;
   profilePicture: string;
-  preferredContact: 'Email' | 'Phone' | 'WhatsApp';
-  gender: 'Male' | 'Female' | 'Other';
+  preferredContact: 'Phone' | 'Email' | 'WhatsApp';
+  gender: 'Male' | 'Female' | 'Non-Binary' | 'Other';
   age: number;
   isConsultationBooked: boolean;
   notes: string;
   preferredConsultationDate: string | null;
   referralSource: string;
-  address: Address;
-  education: Education;
-  professional: Professional;
-  documents: Documents;
   createdAt: string;
   updatedAt: string;
 }

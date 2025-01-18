@@ -1,26 +1,23 @@
-import React, { useEffect, useState } from 'react';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import React from 'react';
 import { Link } from 'react-router-dom';
+import { Clock, Building2, DollarSign } from 'lucide-react';
 import { Button } from '../../../ui/Button';
+import { Carousel } from '../../../ui/Carousel';
 import { courseApi } from '../../../../features/courses/api/courseApi';
 import type { Course } from '../../../../features/courses/types/course';
 
 export const CourseSlider = () => {
-  const [courses, setCourses] = useState<Course[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const [courses, setCourses] = React.useState<Course[]>([]);
+  const [loading, setLoading] = React.useState(true);
 
-  useEffect(() => {
+  React.useEffect(() => {
     const fetchCourses = async () => {
       try {
         const data = await courseApi.getAll();
-        // Randomize courses
-        const shuffled = [...data].sort(() => Math.random() - 0.5);
-        setCourses(shuffled.slice(0, 6)); // Take 6 random courses
+        // Take first 6 courses for the slider
+        setCourses(data.slice(0, 6));
       } catch (err) {
         console.error('Error fetching courses:', err);
-        setError('Failed to load courses');
       } finally {
         setLoading(false);
       }
@@ -29,104 +26,47 @@ export const CourseSlider = () => {
     fetchCourses();
   }, []);
 
-  useEffect(() => {
-    // Auto-slide every 5 seconds
-    const timer = setInterval(() => {
-      setCurrentIndex((prev) => (prev + 1) % Math.ceil(courses.length / 2));
-    }, 5000);
+  if (loading || courses.length === 0) return null;
 
-    return () => clearInterval(timer);
-  }, [courses.length]);
-
-  const nextSlide = () => {
-    setCurrentIndex((prev) => (prev + 1) % Math.ceil(courses.length / 2));
-  };
-
-  const prevSlide = () => {
-    setCurrentIndex((prev) => 
-      prev === 0 ? Math.ceil(courses.length / 2) - 1 : prev - 1
-    );
-  };
-
-  if (loading) {
-    return (
-      <div className="space-y-4 animate-pulse">
-        <div className="h-48 bg-gray-200 dark:bg-gray-700 rounded-lg" />
-        <div className="h-48 bg-gray-200 dark:bg-gray-700 rounded-lg" />
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="text-center py-8">
-        <p className="text-red-500">{error}</p>
-      </div>
-    );
-  }
-
-  return (
-    <div className="relative">
-      <div className="overflow-hidden">
-        <div 
-          className="flex transition-transform duration-500 ease-in-out"
-          style={{ transform: `translateX(-${currentIndex * 100}%)` }}
-        >
-          {courses.map((course, index) => (
-            <Link
-              key={course._id}
-              to={`/courses/${course._id}`}
-              className="w-full md:w-1/2 flex-shrink-0 p-2"
-            >
-              <div className="bg-white dark:bg-gray-800 rounded-lg p-4 h-full hover:shadow-lg transition-shadow">
-                <h4 className="font-medium text-lg mb-2 line-clamp-1">
-                  {course.name}
-                </h4>
-                <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
-                  {course.program.university.name}
-                </p>
-                <div className="flex items-center justify-between text-sm">
-                  <span className="text-blue-600 dark:text-blue-400">
-                    {course.duration}
-                  </span>
-                  <span className="bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 px-2 py-1 rounded">
-                    {course.mode}
-                  </span>
-                </div>
-              </div>
-            </Link>
-          ))}
+  const courseSlides = courses.map((course) => (
+    <Link 
+      key={course._id}
+      to={`/courses/${course._id}`}
+      className="block p-2"
+    >
+      <div className="bg-white dark:bg-gray-800 rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow">
+        <img
+          src={course.program.university.image || 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1'}
+          alt={course.name}
+          className="w-full h-48 object-cover"
+        />
+        <div className="p-4">
+          <h3 className="font-semibold text-lg mb-2 line-clamp-1">{course.name}</h3>
+          <div className="flex items-center text-sm text-gray-600 dark:text-gray-400 mb-2">
+            <Building2 className="w-4 h-4 mr-2" />
+            <span className="line-clamp-1">{course.program.university.name}</span>
+          </div>
+          <div className="grid grid-cols-2 gap-2 mb-4">
+            <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
+              <Clock className="w-4 h-4 mr-2" />
+              <span>{course.duration}</span>
+            </div>
+            <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
+              <DollarSign className="w-4 h-4 mr-2" />
+              <span>${course.fee.toLocaleString()}/yr</span>
+            </div>
+          </div>
+          <Button className="w-full">View Details</Button>
         </div>
       </div>
+    </Link>
+  ));
 
-      {/* Navigation Buttons */}
-      <button
-        onClick={prevSlide}
-        className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 w-8 h-8 bg-white dark:bg-gray-800 rounded-full shadow-lg flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-700"
-      >
-        <ChevronLeft className="w-5 h-5" />
-      </button>
-      <button
-        onClick={nextSlide}
-        className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 w-8 h-8 bg-white dark:bg-gray-800 rounded-full shadow-lg flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-700"
-      >
-        <ChevronRight className="w-5 h-5" />
-      </button>
-
-      {/* Dots */}
-      <div className="flex justify-center mt-4 space-x-2">
-        {[...Array(Math.ceil(courses.length / 2))].map((_, i) => (
-          <button
-            key={i}
-            onClick={() => setCurrentIndex(i)}
-            className={`w-2 h-2 rounded-full transition-all ${
-              i === currentIndex 
-                ? 'w-4 bg-blue-600 dark:bg-blue-400' 
-                : 'bg-gray-300 dark:bg-gray-600'
-            }`}
-          />
-        ))}
-      </div>
-    </div>
+  return (
+    <Carousel 
+      items={courseSlides}
+      className="pb-12"
+      interval={6000}
+    />
   );
 };

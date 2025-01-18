@@ -8,9 +8,11 @@ import { UniversityPage } from '../pages/public/UniversityPage';
 import { JobsPage } from '../pages/public/JobsPage';
 import { NewsPage } from '../pages/public/NewsPage';
 import { SingleNewsPage } from '../pages/public/SingleNewsPage';
+import { ServicesPage } from '../pages/public/ServicesPage';
 import { LoginPage } from '../pages/auth/LoginPage';
 import { RegisterPage } from '../pages/auth/RegisterPage';
 import { UnauthorizedPage } from '../pages/auth/UnauthorizedPage';
+import { CompleteProfilePage } from '../pages/auth/CompleteProfilePage';
 
 export const PublicRoutes = (
   <>
@@ -22,8 +24,10 @@ export const PublicRoutes = (
     <Route path="/jobs" element={<JobsPage />} />
     <Route path="/news" element={<NewsPage />} />
     <Route path="/news/:id" element={<SingleNewsPage />} />
+    <Route path="/services" element={<ServicesPage />} />
     <Route path="/login" element={<LoginPage />} />
     <Route path="/register" element={<RegisterPage />} />
+    <Route path="/complete-profile" element={<CompleteProfilePage />} />
     <Route path="/unauthorized" element={<UnauthorizedPage />} />
   </>
 );

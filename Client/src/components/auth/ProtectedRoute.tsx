@@ -4,7 +4,7 @@ import { useAuthStore } from '../../store/authStore';
 import type { UserRole } from '../../types/auth';
 
 interface ProtectedRouteProps {
-  children: React.ReactNode;
+  children: React.ReactNode | ((props: { user: any }) => React.ReactNode);
   allowedRoles?: UserRole[];
 }
 
@@ -19,11 +19,15 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     return <Navigate to="/login" state={{ from: location.pathname }} replace />;
   }
 
-  // Map administrator role to admin for consistency
-  const userRole = user.role === 'administrator' ? 'admin' : user.role;
+  // Map administrator role to admin for consistency in role checks
+  const effectiveRole = user.role === 'administrator' ? 'admin' : user.role;
 
-  if (allowedRoles.length > 0 && !allowedRoles.includes(userRole as UserRole)) {
+  if (allowedRoles.length > 0 && !allowedRoles.includes(effectiveRole as UserRole)) {
     return <Navigate to="/unauthorized" replace />;
+  }
+
+  if (typeof children === 'function') {
+    return <>{children({ user })}</>;
   }
 
   return <>{children}</>;

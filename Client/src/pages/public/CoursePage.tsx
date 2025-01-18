@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
+import toast from 'react-hot-toast';
 import { 
   Clock, GraduationCap, BookOpen, Users, 
   DollarSign, MapPin, Building2, Calendar,
@@ -14,10 +15,15 @@ import { CourseBottomBar } from '../../features/courses/components/CourseBottomB
 import { CourseDetails } from '../../features/courses/components/CourseDetails';
 import { UniversityCard } from '../../features/courses/components/UniversityCard';
 import { courseApi } from '../../features/courses/api/courseApi';
+import { visitorApi } from '../../features/visitors/api/visitorApi';
+import { useAuthStore } from '../../store/authStore';
 import type { Course } from '../../features/courses/types/course';
 
 export const CoursePage = () => {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
+  const { isAuthenticated, user } = useAuthStore();
+
   const [course, setCourse] = useState<Course | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -42,9 +48,21 @@ export const CoursePage = () => {
     fetchCourse();
   }, [id]);
 
-  const handleApply = () => {
-    // Handle course application
-    console.log('Applying for course:', course?._id);
+  const handleApply = async () => {
+    if (!isAuthenticated) {
+      toast.error('Please login to apply for this course');
+      navigate('/login', { state: { from: `/courses/${id}` } });
+      return;
+    }
+
+    try {
+      await visitorApi.update(user.id, { interestedCourse: course!._id });
+      console.log('Successfully applied for course');
+      toast.success('Successfully applied for course!');
+    } catch (err) {
+      console.error('Error applying for course:', err);
+      toast.error('Failed to apply for course. Please try again.');
+    }
   };
 
   if (loading) {
@@ -88,7 +106,6 @@ export const CoursePage = () => {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Main Content */}
           <div className="lg:col-span-2 space-y-6">
             <div>
               <Link to="/courses" className="text-blue-600 hover:text-blue-700 flex items-center">
@@ -114,7 +131,6 @@ export const CoursePage = () => {
             <CourseDetails course={course} />
           </div>
 
-          {/* Sidebar */}
           <div className="space-y-6">
             <Card className="p-6">
               <div className="space-y-4">
@@ -133,7 +149,7 @@ export const CoursePage = () => {
                   <GraduationCap className="w-4 h-4 mr-2 text-blue-600" />
                   <span>{program.degree.name}</span>
                 </div>
-                
+
                 <div className="flex items-center text-sm">
                   <MapPin className="w-4 h-4 mr-2 text-blue-600" />
                   <span>{university.location}</span>

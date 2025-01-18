@@ -3,6 +3,8 @@ import { Helmet } from 'react-helmet-async';
 import { HomeLayout } from '../components/layout/HomeLayout';
 import { HeroSection } from '../components/home/HeroSection';
 import { FeaturedSection } from '../components/home/FeaturedSection';
+import { ServicesSection } from '../components/home/ServicesSection';
+import { TeamSection } from '../components/home/TeamSection';
 import { JourneySection } from '../components/home/JourneySection';
 import { TestimonialsSection } from '../components/home/TestimonialsSection';
 import { GlobalPresenceSection } from '../components/home/GlobalPresenceSection';
@@ -18,6 +20,8 @@ export const Home = () => {
       <main>
         <HeroSection />
         <FeaturedSection />
+        <ServicesSection />
+        <TeamSection />
         <JourneySection />
         <TestimonialsSection />
         <GlobalPresenceSection />

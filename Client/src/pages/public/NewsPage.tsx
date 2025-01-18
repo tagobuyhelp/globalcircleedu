@@ -20,31 +20,39 @@ export const NewsPage = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
-  useEffect(() => {
-    const fetchNews = async () => {
-      try {
-        setLoading(true);
-        const response = await newsApi.getAll(currentPage, ITEMS_PER_PAGE);
-        setNews(response.data);
-        setTotalPages(response.totalPages);
-      } catch (err) {
-        console.error('Error fetching news:', err);
-        setError('Failed to load news');
-      } finally {
-        setLoading(false);
+useEffect(() => {
+  const fetchNews = async () => {
+    try {
+      setLoading(true);
+      const response = await newsApi.getAll(currentPage, ITEMS_PER_PAGE);
+      
+      if (response?.data?.news) {
+        setNews(response.data.news);
+        setTotalPages(response.data.pagination.totalPages);
+      } else {
+        setNews([]);
+        setError('No news articles available');
       }
-    };
+    } catch (err) {
+      console.error('Error fetching news:', err);
+      setError('Failed to load news');
+      setNews([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    fetchNews();
-  }, [currentPage]);
+  fetchNews();
+}, [currentPage]);
 
-  const filteredNews = searchTerm 
-    ? news.filter(item =>
-        item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.content.toLowerCase().includes(searchTerm.toLowerCase())
-      )
-    : news;
-
+// Add null check before filtering
+const filteredNews = news?.length ? 
+  news.filter(item =>
+    searchTerm ? (
+      item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.content.toLowerCase().includes(searchTerm.toLowerCase())
+    ) : true
+  ) : [];
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -57,7 +65,7 @@ export const NewsPage = () => {
     <>
       <Helmet>
         <title>Latest News | Global Circle Edu</title>
-        <meta name="description" content="Stay updated with the latest news and updates from Global Circle Edu. Read about education, technology, and global opportunities." />
+        <meta name="description" content="Stay updated with the latest news and updates from Global Circle Edu." />
       </Helmet>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -76,7 +84,7 @@ export const NewsPage = () => {
           </div>
         </div>
 
-        {filteredNews.length > 0 ? (
+        {filteredNews && filteredNews.length > 0 ? (
           <>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredNews.map((item) => (
