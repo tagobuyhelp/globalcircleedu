@@ -43,7 +43,7 @@ export const getAllUniversities = asyncHandler(async (req, res) => {
     const totalPages = Math.ceil(totalUniversities / limit);
 
     res.status(200).json(new ApiResponse(200, {
-        universities: universitiesWithFullUrls,
+        universities: universities,
         currentPage: page,
         totalPages: totalPages,
         totalUniversities: totalUniversities
