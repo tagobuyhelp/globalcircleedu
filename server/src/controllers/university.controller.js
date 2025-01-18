@@ -58,6 +58,9 @@ export const getUniversityById = asyncHandler(async (req, res) => {
         throw new ApiError(404, "University not found");
     }
 
+    // Convert university document to a plain JavaScript object
+    const uniObj = university.toObject();
+
     // Fetch programs for this university
     const programs = await Program.find({ university: universityId })
         .populate('degree', 'name');
@@ -65,7 +68,6 @@ export const getUniversityById = asyncHandler(async (req, res) => {
     // Fetch courses for this university's programs
     const programIds = programs.map(program => program._id);
     const courses = await Course.find({ program: { $in: programIds } });
-
 
     // Add programs and courses to the university object
     uniObj.programs = programs.map(program => {
@@ -76,7 +78,6 @@ export const getUniversityById = asyncHandler(async (req, res) => {
 
     res.status(200).json(new ApiResponse(200, uniObj, "University fetched successfully"));
 });
-
 export const updateUniversity = asyncHandler(async (req, res) => {
     const updateData = req.body;
 
