@@ -22,6 +22,7 @@ const agentSchema = new mongoose.Schema({
         bankName: String,
         accountNumber: String,
         accountHolderName: String,
+        ifscCode: String,
         paypalEmail: String,
         stripeAccountId: String
     },
