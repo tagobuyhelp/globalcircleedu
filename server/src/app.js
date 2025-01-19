@@ -12,14 +12,14 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
     cors: {
-        origin: ['http://localhost:4000', 'https://globalcircleedu.tagobuy.site', 'https://globalcircleedu.netlify.app'],
+        origin: ['http://localhost:4000', 'https://globalcircleedu.com', 'https://globalcircleedu.netlify.app'],
         methods: ['GET', 'POST'],
         credentials: true
     }
 });
 
 // CORS configuration
-const allowedOrigins = ['http://localhost:4000', 'https://globalcircleedu.tagobuy.site', 'https://globalcircleedu.netlify.app', 'https://fascinating-liger-1082c0.netlify.app', 'http://localhost:5173', 'https://fascinating-liger-1082c0.netlify.app'];
+const allowedOrigins = ['https://globalcircleedu.com', 'https://globalcircleedu.tagobuy.site', 'https://globalcircleedu.netlify.app', 'https://fascinating-liger-1082c0.netlify.app', 'http://localhost:5173', 'https://fascinating-liger-1082c0.netlify.app'];
 
 const corsOptions = {
     origin: function (origin, callback) {
@@ -48,7 +48,7 @@ const upload = multer();
 app.use(upload.any());
 
 app.get('/', (req, res) => {
-    res.send('Welcome to Global Circle Edu Server');
+    res.send('Welcome to Global Circle Edu Server V:1.0');
 });
 
 // Import routes
