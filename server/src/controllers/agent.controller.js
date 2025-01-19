@@ -11,7 +11,8 @@ import mongoose from 'mongoose';
 
 // Visitor Management
 export const createVisitor = asyncHandler(async (req, res) => {
-    const agentId = req.user._id;
+    const userId = req.user._id;
+    const agentId = await Agent.findOne({ user: userId });
     const visitorData = req.body;
 
     const visitor = new Visitor({
@@ -90,7 +91,8 @@ export const createApplication = asyncHandler(async (req, res) => {
 });
 
 export const getAgentApplications = asyncHandler(async (req, res) => {
-    const agentId = req.user._id;
+    const userId = req.user._id;
+    const agentId = await Agent.findOne({ user: userId });
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
 
@@ -113,7 +115,8 @@ export const getAgentApplications = asyncHandler(async (req, res) => {
 
 export const updateApplication = asyncHandler(async (req, res) => {
     const { applicationId } = req.params;
-    const agentId = req.user._id;
+    const userId = req.user._id;
+    const agentId = await Agent.findOne({ user: userId });
     const updateData = req.body;
 
     const application = await Application.findOneAndUpdate(
@@ -132,7 +135,8 @@ export const updateApplication = asyncHandler(async (req, res) => {
 // OTRA (One-Time Recovery Amount) Management
 export const createOtraRequest = asyncHandler(async (req, res) => {
     const { applicationId, amount, reason } = req.body;
-    const agentId = req.user._id;
+    const userId = req.user._id;
+    const agentId = await Agent.findOne({ user: userId });
 
     const application = await Application.findOne({ _id: applicationId, agentId });
     if (!application) {
@@ -176,7 +180,8 @@ export const updatePaymentMethod = asyncHandler(async (req, res) => {
 });
 
 export const getPaymentMethod = asyncHandler(async (req, res) => {
-    const agentId = req.user._id;
+    const userId = req.user._id;
+    const agentId = await Agent.findOne({ user: userId });
 
     const paymentMethod = await Payment.findOne({ agentId });
 
@@ -189,7 +194,9 @@ export const getPaymentMethod = asyncHandler(async (req, res) => {
 
 // Agent Statistics and Analytics
 export const getAgentStats = asyncHandler(async (req, res) => {
-    const agentId = req.user._id;
+    const userId = req.user._id;
+    const agentId = await Agent.findOne({user: userId });
+
 
     const visitorCount = await Visitor.countDocuments({ createdBy: agentId });
     const applicationCount = await Application.countDocuments({ agentId });
@@ -229,7 +236,8 @@ export const getAgentStats = asyncHandler(async (req, res) => {
 // Get Application Details
 export const getApplicationDetails = asyncHandler(async (req, res) => {
     const { applicationId } = req.params;
-    const agentId = req.user._id;
+    const userId = req.user._id;
+    const agentId = await Agent.findOne({ user: userId });
 
     const application = await Application.findOne({ _id: applicationId, agentId })
         .populate('visitorId')
@@ -244,7 +252,8 @@ export const getApplicationDetails = asyncHandler(async (req, res) => {
 
 // Request Withdrawal
 export const requestWithdrawal = asyncHandler(async (req, res) => {
-    const agentId = req.user._id;
+    const userId = req.user._id;
+    const agentId = await Agent.findOne({ user: userId });
     const { amount, bankDetails } = req.body;
 
     const agent = await Agent.findById(agentId);
@@ -270,7 +279,8 @@ export const requestWithdrawal = asyncHandler(async (req, res) => {
 
 // Get Withdrawal Requests
 export const getWithdrawalRequests = asyncHandler(async (req, res) => {
-    const agentId = req.user._id;
+    const userId = req.user._id;
+    const agentId = await Agent.findOne({ user: userId });
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
 
@@ -292,7 +302,8 @@ export const getWithdrawalRequests = asyncHandler(async (req, res) => {
 
 // Get Agent Commission History
 export const getCommissionHistory = asyncHandler(async (req, res) => {
-    const agentId = req.user._id;
+    const userId = req.user._id;
+    const agentId = await Agent.findOne({ user: userId });
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
 
