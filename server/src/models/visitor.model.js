@@ -97,8 +97,8 @@ const visitorSchema = new mongoose.Schema(
         notes: { type: String }, // Internal notes
         preferredConsultationDate: { type: Date },
         referralSource: { type: String }, // E.g., Google, Social Media
-        // Add this field to the visitorSchema
         createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "Agent" },
+        agent: { type: mongoose.Schema.Types.ObjectId, ref: "Agent" },
     },
     { timestamps: true }
 );
