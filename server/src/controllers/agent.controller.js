@@ -10,7 +10,7 @@ import { WithdrawalRequest } from "../models/withdrawalRequest.model.js";
 import { Commission } from "../models/commission.model.js";
 import { generateRandomPassword } from "../utils/passwordUtils.js";
 import { notifyAdmins, notifyUser } from "../utils/sendEmail.js";
-import { cloudinaryUpload } from "../utils/cloudinaryUpload.js";
+import uploadToCloudinary from "../utils/uploadToCloudinary.js";
 
 // Visitor Management
 export const createVisitor = asyncHandler(async (req, res) => {
@@ -38,11 +38,11 @@ export const createVisitor = asyncHandler(async (req, res) => {
     const languageTests = req.files?.['documents.languageTests']?.[0];
 
     // Upload files to Cloudinary
-    const profilePictureResult = profilePicture ? await cloudinaryUpload(profilePicture) : null;
-    const identityDocumentResult = identityDocument ? await cloudinaryUpload(identityDocument) : null;
-    const transcriptResult = transcript ? await cloudinaryUpload(transcript) : null;
-    const workExperienceResult = workExperience ? await cloudinaryUpload(workExperience) : null;
-    const languageTestsResult = languageTests ? await cloudinaryUpload(languageTests) : null;
+    const profilePictureResult = profilePicture ? await uploadToCloudinary(profilePicture) : null;
+    const identityDocumentResult = identityDocument ? await uploadToCloudinary(identityDocument) : null;
+    const transcriptResult = transcript ? await uploadToCloudinary(transcript) : null;
+    const workExperienceResult = workExperience ? await uploadToCloudinary(workExperience) : null;
+    const languageTestsResult = languageTests ? await uploadToCloudinary(languageTests) : null;
 
     
 

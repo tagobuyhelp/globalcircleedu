@@ -1,10 +1,9 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
 const applicationSchema = new mongoose.Schema({
     agentId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Agent',
-        required: true
+        ref: 'Agent'
     },
     visitorId: {
         type: mongoose.Schema.Types.ObjectId,
@@ -19,7 +18,7 @@ const applicationSchema = new mongoose.Schema({
         },
         status: {
             type: String,
-            enum: ['Pending', 'Approved', 'Rejected', 'Paid'],
+            enum: ['Pending', 'In Progress', 'Completed', 'Cancelled'],
             default: 'Pending'
         },
         paymentStatus: {
@@ -36,6 +35,11 @@ const applicationSchema = new mongoose.Schema({
             default: 0
         }
     }],
+    status: {
+        type: String,
+        enum: ['Pending', 'Approved', 'Rejected', 'Completed'],
+        default: 'Pending'
+    },
     totalAmountPaid: {
         type: Number,
         default: 0
@@ -44,15 +48,12 @@ const applicationSchema = new mongoose.Schema({
         type: Number,
         default: 0
     },
-    overallStatus: {
-        type: String,
-        enum: ['Pending', 'In Progress', 'Completed', 'Cancelled'],
-        default: 'Pending'
-    },
-    adminNotes: {
-        type: String,
-        default: ''
+    adminNotes: String,
+    createdBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
     }
 }, { timestamps: true });
 
-export const Application = mongoose.model("Application", applicationSchema);
+export const Application = mongoose.model('Application', applicationSchema);

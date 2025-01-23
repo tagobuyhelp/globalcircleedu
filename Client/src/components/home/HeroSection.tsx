@@ -1,9 +1,34 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Search, GraduationCap, Briefcase, Globe } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { BackgroundSlider } from './BackgroundSlider';
 
 export const HeroSection = () => {
+  const navigate = useNavigate();
+  const [searchTerm, setSearchTerm] = useState('');
+  const [searchType, setSearchType] = useState<'courses' | 'jobs' | 'all'>('all');
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!searchTerm.trim()) return;
+
+    const searchParams = new URLSearchParams();
+    searchParams.set('q', searchTerm);
+
+    switch (searchType) {
+      case 'courses':
+        navigate(`/courses?${searchParams.toString()}`);
+        break;
+      case 'jobs':
+        navigate(`/jobs?${searchParams.toString()}`);
+        break;
+      default:
+        // Search all sections
+        navigate(`/search?${searchParams.toString()}`);
+    }
+  };
+
   return (
     <section className="relative min-h-[600px] flex items-center">
       <BackgroundSlider />
@@ -26,16 +51,31 @@ export const HeroSection = () => {
             </p>
             
             {/* Search Bar */}
-            <div className="relative max-w-xl">
-              <input
-                type="text"
-                placeholder="Search courses, universities, or jobs..."
-                className="w-full px-6 py-4 rounded-full text-gray-900 bg-white/95 shadow-lg focus:outline-none focus:ring-2 focus:ring-emerald-400 placeholder-gray-500"
-              />
-              <Button className="absolute right-2 top-2 rounded-full px-6 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700">
-                <Search className="h-5 w-5" />
-              </Button>
-            </div>
+            <form onSubmit={handleSearch} className="max-w-xl">
+              <div className="relative">
+                <input
+                  type="text"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  placeholder="Search courses, universities, or jobs..."
+                  className="w-full px-6 py-4 pr-32 rounded-full text-gray-900 bg-white/95 shadow-lg focus:outline-none focus:ring-2 focus:ring-emerald-400 placeholder-gray-500"
+                />
+                <div className="absolute right-2 top-2 flex space-x-2">
+                  <select 
+                    value={searchType}
+                    onChange={(e) => setSearchType(e.target.value as 'courses' | 'jobs' | 'all')}
+                    className="px-3 py-2 rounded-full text-sm bg-gray-100 border-none focus:ring-2 focus:ring-emerald-400 text-black"
+                  >
+                    <option value="all">All</option>
+                    <option value="courses">Courses</option>
+                    <option value="jobs">Jobs</option>
+                  </select>
+                  <Button type="submit" className="rounded-full px-6 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700">
+                    <Search className="h-5 w-5" />
+                  </Button>
+                </div>
+              </div>
+            </form>
 
             {/* Quick Stats */}
             <div className="grid grid-cols-3 gap-6 mt-12">

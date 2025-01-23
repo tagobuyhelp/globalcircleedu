@@ -1,4 +1,12 @@
-export type PaymentMethod = 'bank_transfer' | 'paypal' | 'stripe';
+export type PaymentMethod = 'bank' | 'paypal' | 'other';
+
+export interface PaymentDetails {
+  bankName?: string;
+  accountNumber?: string;
+  accountHolderName?: string;
+  paypalEmail?: string;
+  otherDetails?: Record<string, string>;
+}
 
 export interface Visitor {
   _id: string;
@@ -30,26 +38,39 @@ export interface Application {
 }
 
 export interface AgentStats {
+  visitorCount: number;
+  applicationCount: number;
   totalApplications: number;
   approvedApplications: number;
+  pendingApplications: number;
+  rejectedApplications: number;
   totalCommission: number;
-  totalEarned: number;
+  totalBalance: number;
   availableBalance: number;
+  commissionEarned: number;
 }
 
 export interface WithdrawalRequest {
   _id: string;
   amount: number;
-  status: 'Pending' | 'Approved' | 'Declined';
-  paymentMethod: PaymentMethod;
-  paymentDetails: Record<string, string>;
+  status: 'Pending' | 'Approved' | 'Rejected';
+  bankDetails: Record<string, string>;
   createdAt: string;
 }
 
-export interface PaymentDetails {
-  bankName?: string;
-  accountNumber?: string;
-  accountHolderName?: string;
-  paypalEmail?: string;
-  stripeAccountId?: string;
+export interface Commission {
+  _id: string;
+  applicationId: string;
+  amount: number;
+  status: 'Pending' | 'Paid';
+  createdAt: string;
+}
+
+export interface OtraRequest {
+  _id: string;
+  applicationId: string;
+  amount: number;
+  reason: string;
+  status: 'Pending' | 'Approved' | 'Rejected';
+  createdAt: string;
 }

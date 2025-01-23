@@ -3,9 +3,7 @@ import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import errorMiddleware from './middleware/error.middleware.js';
 import http from 'http';
-import multer from 'multer';
 import { Server } from 'socket.io';
-import uploadRoutes from './routes/uploadRoutes.js';
 
 
 const app = express();
@@ -19,7 +17,7 @@ const io = new Server(server, {
 });
 
 // CORS configuration
-const allowedOrigins = ['https://globalcircleedu.com', 'https://globalcircleedu.tagobuy.site', 'https://globalcircleedu.netlify.app', 'https://fascinating-liger-1082c0.netlify.app', 'http://localhost:5173', 'https://fascinating-liger-1082c0.netlify.app'];
+const allowedOrigins = ['https://globalcircleedu.com', 'https://devgce.netlify.app', 'https://globalcircleedu.netlify.app', 'https://fascinating-liger-1082c0.netlify.app', 'http://localhost:5173', 'https://fascinating-liger-1082c0.netlify.app'];
 
 const corsOptions = {
     origin: function (origin, callback) {
@@ -36,16 +34,14 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 
-app.use(express.json({ limit: '16kb' }));
-app.use(express.urlencoded({ extended: true, limit: '16kb' }));
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ limit: '50mb', extended: true }));
 app.use(express.static("public"));
 app.use('/images', express.static('images'));
 app.use('/images/photos', express.static('images/photos'));
 app.use(cookieParser());
-app.use('/', uploadRoutes);
 
-const upload = multer();
-app.use(upload.any());
+
 
 app.get('/', (req, res) => {
     res.send('Welcome to Global Circle Edu Server V:1.0');
@@ -71,13 +67,14 @@ import paymentRoutes from './routes/payment.routes.js';
 import billingRoutes from './routes/billing.routes.js';
 import testimonialRoutes from './routes/testimonial.routes.js';
 import teamMemberRoutes from './routes/teamMember.routes.js';
+import applicationRoutes from './routes/application.routes.js';
 
 
 // Route declaration
 app.use("/users", userRouter);
 app.use("/auth", authRouter);
 app.use("/visitor", visitorRouter);
-
+app.use('/applications', applicationRoutes);
 app.use("/course", courseRouter);
 app.use("/universities", universityRouter);
 app.use("/news", newsRouter);

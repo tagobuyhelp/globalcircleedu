@@ -6,57 +6,56 @@ import { News } from '../models/news.model.js';
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/apiError.js";
 import { ApiResponse } from "../utils/apiResponse.js";
-import { cloudinaryUpload } from "../utils/cloudinaryUpload.js";
+import uploadToCloudinary from "../utils/uploadToCloudinary.js";
 import { notifyAdmins, notifyUser } from '../utils/sendEmail.js';
 
 
 // Create a new visitor
 export const createVisitor = asyncHandler(async (req, res) => {
-    try {
-        const visitorData = req.body;
-        visitorData.documents = {};
+    const visitorData = req.body;
+    visitorData.documents = {};
 
-        // Handle profile picture
-        if (req.files && req.files.profilePicture) {
-            const profilePicture = req.files.profilePicture[0];
-            const result = await cloudinaryUpload(profilePicture);
-            visitorData.profilePicture = result.secure_url;
-        }
-
-        // Handle document uploads
-        const documentFields = ['identityDocument', 'transcript', 'workExperience', 'languageTests'];
-        for (const field of documentFields) {
-            if (req.files && req.files[field]) {
-                const file = req.files[field][0];
-                const result = await cloudinaryUpload(file);
-                visitorData.documents[field] = {
-                    name: file.originalname,
-                    fileURL: result.secure_url,
-                    documentType: file.mimetype,
-                };
-            }
-        }
-
-        // Save visitor data
-        const visitor = await Visitor.create(visitorData);
-
-        await notifyAdmins(
-            'New Visitor Registration',
-            `A new visitor has registered: ${visitor.name} (${visitor.email})`,
-            `<h1>New Visitor Registration</h1><p>A new visitor has registered:</p><p><strong>Name:</strong> ${visitor.name}</p><p><strong>Email:</strong> ${visitor.email}</p>`
-        );
-        
-        await notifyUser(
-            visitor.email,
-            'Welcome to Global Circle Edu',
-            `Dear ${visitor.name},\n\nThank you for registering with Global Circle Edu. We're excited to have you on board!`,
-            `<h1>Welcome to Global Circle Edu</h1><p>Dear ${visitor.name},</p><p>Thank you for registering with Global Circle Edu. We're excited to have you on board!</p>`
-        );
-
-        res.status(201).json(new ApiResponse(201, visitor, "Visitor created successfully"));
-    } catch (error) {
-        res.status(400).json(new ApiResponse(400, null, error.message));
+    // Handle profile picture
+    if (req.files && req.files.profilePicture) {
+        const profilePicture = req.files.profilePicture[0];
+        const result = await uploadToCloudinary(profilePicture);
+        visitorData.profilePicture = result.url;
     }
+
+    // Handle document uploads
+    const documentFields = ['identityDocument', 'transcript', 'workExperience', 'languageTests'];
+    for (const field of documentFields) {
+        if (req.files && req.files[field]) {
+            const file = req.files[field][0];
+            const result = await uploadToCloudinary(file);
+            visitorData.documents[field] = {
+                name: file.originalname,
+                fileURL: result.url,
+                documentType: file.mimetype,
+            };
+        }
+    }
+
+    // Save visitor data
+    const visitor = await Visitor.create(visitorData);
+
+    // Populate related fields
+    await visitor.populate("interestedCourse interestedJob");
+
+    await notifyAdmins(
+        'New Visitor Registration',
+        `A new visitor has registered: ${visitor.name} (${visitor.email})`,
+        `<h1>New Visitor Registration</h1><p>A new visitor has registered:</p><p><strong>Name:</strong> ${visitor.name}</p><p><strong>Email:</strong> ${visitor.email}</p>`
+    );
+    
+    await notifyUser(
+        visitor.email,
+        'Welcome to Global Circle Edu',
+        `Dear ${visitor.name},\n\nThank you for registering with Global Circle Edu. We're excited to have you on board!`,
+        `<h1>Welcome to Global Circle Edu</h1><p>Dear ${visitor.name},</p><p>Thank you for registering with Global Circle Edu. We're excited to have you on board!</p>`
+    );
+
+    res.status(201).json(new ApiResponse(201, visitor, "Visitor created successfully"));
 });
 
 
@@ -81,7 +80,7 @@ export const getAllVisitors = asyncHandler(async (req, res) => {
     
 
     res.status(200).json(new ApiResponse(200, {
-        visitors: visitorsWithFullUrls,
+        visitors: visitors,
         currentPage: page,
         totalPages: Math.ceil(total / limit),
         totalVisitors: total
@@ -111,22 +110,11 @@ export const getVisitorById = asyncHandler(async (req, res) => {
 
 
 
+
 // Update a visitor
 export const updateVisitor = asyncHandler(async (req, res) => {
     const visitorId = req.params.id;
-    let updateData;
-
-
-    if (req.is('multipart/form-data')) {
-        // Handle form-data
-        updateData = req.body;
-        console.log("Received form-data:", updateData);
-    } else {
-        // Handle JSON data
-        updateData = req.body;
-        console.log("Received JSON data:", JSON.stringify(updateData, null, 2));
-    }
-
+    let updateData = req.body;
 
     // Find the existing visitor
     let visitor = await Visitor.findById(visitorId);
@@ -140,23 +128,25 @@ export const updateVisitor = asyncHandler(async (req, res) => {
     // Handle profile picture update
     if (req.files && req.files.profilePicture) {
         const profilePicture = req.files.profilePicture[0];
-        const result = await cloudinaryUpload(profilePicture);
-        updateData.profilePicture = result.secure_url;
+        const result = await uploadToCloudinary(profilePicture);
+        updateData.profilePicture = result.url;
     }
-
 
     // Handle document updates
     const documentFields = ['identityDocument', 'transcript', 'workExperience', 'languageTests'];
+    if (!updateData.documents) updateData.documents = {};
     for (const field of documentFields) {
         if (req.files && req.files[field]) {
             const file = req.files[field][0];
-            const result = await cloudinaryUpload(file);
-            if (!updateData.documents) updateData.documents = {};
+            const result = await uploadToCloudinary(file);
             updateData.documents[field] = {
                 name: file.originalname,
-                fileURL: result.secure_url,
+                fileURL: result.url,
                 documentType: file.mimetype,
             };
+        } else if (visitor.documents && visitor.documents[field]) {
+            // Preserve existing documents if not updated
+            updateData.documents[field] = visitor.documents[field];
         }
     }
 
@@ -164,30 +154,13 @@ export const updateVisitor = asyncHandler(async (req, res) => {
     visitor = await Visitor.findByIdAndUpdate(visitor._id, updateData, {
         new: true,
         runValidators: true,
-    })
-    .populate("interestedCourse")
-    .populate("interestedJob");
+    }).populate("interestedCourse interestedJob");
 
     if (!visitor) {
         throw new ApiError(404, "Visitor not found after update");
     }
 
-    // Add base URL to profile picture and documents for response
-    const visitorObj = visitor.toObject();
-
-    if (visitorObj.profilePicture) {
-        visitorObj.profilePicture = `${BASE_URL}${visitorObj.profilePicture}`;
-    }
-
-    if (visitorObj.documents) {
-        Object.keys(visitorObj.documents).forEach(docType => {
-            if (visitorObj.documents[docType].fileURL) {
-                visitorObj.documents[docType].fileURL = `${BASE_URL}/${visitorObj.documents[docType].fileURL}`;
-            }
-        });
-    }
-
-    res.status(200).json(new ApiResponse(200, visitorObj, "Visitor updated successfully"));
+    res.status(200).json(new ApiResponse(200, visitor, "Visitor updated successfully"));
 });
 
 // Delete a visitor

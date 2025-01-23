@@ -8,7 +8,7 @@ import {
     bulkCreateVisitors,
     getVisitorStats
 } from '../controllers/visitor.controller.js';
-import { uploadPhotos } from '../middleware/photoUpload.middleware.js';
+import { uploadMixedFiles } from '../middleware/photoUpload.middleware.js';
 import { protect, authorize } from '../middleware/auth.middleware.js';
 
 const router = express.Router();
@@ -20,7 +20,7 @@ const errorHandler = (err, req, res, next) => {
 };
 
 // Public routes
-router.post('/create', uploadPhotos, createVisitor);
+router.post('/create', uploadMixedFiles, createVisitor);
 
 // Protected routes
 router.use(protect);
@@ -39,7 +39,7 @@ router.route('/stats')
 
 router.route('/:id')
     .get(authorize('editor', 'admin', 'administrator', 'visitor'), getVisitorById)
-    .put(authorize('editor', 'admin', 'administrator', 'visitor'), updateVisitor)
+    .put(authorize('editor', 'admin', 'administrator', 'visitor'), uploadMixedFiles, updateVisitor)
     .delete(authorize('admin', 'administrator'), deleteVisitor);
 
 router.route('/bulk')

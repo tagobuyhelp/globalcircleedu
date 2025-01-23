@@ -1,35 +1,31 @@
+import multer from 'multer';
 import { ApiResponse } from "../utils/apiResponse.js";
 import { University } from "../models/university.model.js";
 import { Program } from "../models/program.model.js";
 import { Course } from "../models/course.model.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/apiError.js";
-import { cloudinaryUpload } from "../utils/cloudinaryUpload.js";
+import uploadToCloudinary from "../utils/uploadToCloudinary.js";
 
 
-export const createUniversity = async (req, res) => {
-    try {
-        const universityData = req.body;
+export const createUniversity = asyncHandler(async (req, res) => {
+    const universityData = req.body;
 
-        if (req.files) {
-            if (req.files.logo) {
-                const logoResult = await cloudinaryUpload(req.files.logo[0]);
-                universityData.logo = logoResult.url;
-            }
-            if (req.files.campusPhotos) {
-                const campusPhotoPromises = req.files.campusPhotos.map(file => cloudinaryUpload(file));
-                const campusPhotoResults = await Promise.all(campusPhotoPromises);
-                universityData.campusPhotos = campusPhotoResults.map(result => result.url);
-            }
+    if (req.files) {
+        if (req.files.logo) {
+            const logoResult = await uploadToCloudinary(req.files.logo[0]);
+            universityData.logo = logoResult.url;
         }
-    
-
-        const university = await University.create(universityData);
-        res.status(201).json({ success: true, data: university });
-    } catch (error) {
-        res.status(400).json({ success: false, error: error.message });
+        if (req.files.campusPhotos) {
+            const campusPhotoPromises = req.files.campusPhotos.map(file => uploadToCloudinary(file));
+            const campusPhotoResults = await Promise.all(campusPhotoPromises);
+            universityData.campusPhotos = campusPhotoResults.map(result => result.url);
+        }
     }
-};
+
+    const university = await University.create(universityData);
+    res.status(201).json(new ApiResponse(201, university, "University created successfully"));
+});
 
 export const getAllUniversities = asyncHandler(async (req, res) => {
     const page = parseInt(req.query.page) || 1;
@@ -78,25 +74,24 @@ export const getUniversityById = asyncHandler(async (req, res) => {
 
     res.status(200).json(new ApiResponse(200, uniObj, "University fetched successfully"));
 });
+
 export const updateUniversity = asyncHandler(async (req, res) => {
-    const updateData = req.body;
+    const universityId = req.params.id;
+    let updateData = req.body;
 
     if (req.files) {
         if (req.files.logo) {
-            const logoResult = await uploadOnCloudinary(req.files.logo[0]);
+            const logoResult = await uploadToCloudinary(req.files.logo[0]);
             updateData.logo = logoResult.url;
         }
         if (req.files.campusPhotos) {
-            const campusPhotoPromises = req.files.campusPhotos.map(file => cloudinaryUpload(file));
+            const campusPhotoPromises = req.files.campusPhotos.map(file => uploadToCloudinary(file));
             const campusPhotoResults = await Promise.all(campusPhotoPromises);
             updateData.campusPhotos = campusPhotoResults.map(result => result.url);
         }
     }
 
-    const university = await University.findByIdAndUpdate(req.params.id, updateData, {
-        new: true,
-        runValidators: true
-    });
+    const university = await University.findByIdAndUpdate(universityId, updateData, { new: true });
 
     if (!university) {
         throw new ApiError(404, "University not found");
@@ -104,7 +99,6 @@ export const updateUniversity = asyncHandler(async (req, res) => {
 
     res.status(200).json(new ApiResponse(200, university, "University updated successfully"));
 });
-
 
 export const deleteUniversity = asyncHandler(async (req, res) => {
     const universityId = req.params.id;

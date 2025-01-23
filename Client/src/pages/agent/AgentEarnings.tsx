@@ -1,16 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
-import { DollarSign, ArrowUpRight, Clock } from 'lucide-react';
+import { DollarSign, ArrowUpRight, Clock, CheckCircle } from 'lucide-react';
 import { agentApi } from '../../features/agent/api/agentApi';
 import { WithdrawalForm } from '../../features/agent/components/WithdrawalForm';
 import { PaymentMethodForm } from '../../features/agent/components/PaymentMethodForm';
 import toast from 'react-hot-toast';
-import type { WithdrawalRequest, AgentStats } from '../../features/agent/types';
+import type { WithdrawalRequest, Commission, AgentStats } from '../../features/agent/types';
 
 export const AgentEarnings = () => {
   const [stats, setStats] = useState<AgentStats | null>(null);
   const [withdrawals, setWithdrawals] = useState<WithdrawalRequest[]>([]);
+  const [commissions, setCommissions] = useState<Commission[]>([]);
   const [loading, setLoading] = useState(true);
   const [showWithdrawalForm, setShowWithdrawalForm] = useState(false);
   const [showPaymentForm, setShowPaymentForm] = useState(false);
@@ -21,12 +22,14 @@ export const AgentEarnings = () => {
 
   const fetchData = async () => {
     try {
-      const [statsData, withdrawalsData] = await Promise.all([
+      const [statsData, withdrawalsData, commissionsData] = await Promise.all([
         agentApi.getStats(),
-        agentApi.getWithdrawalRequests()
+        agentApi.getWithdrawalRequests(),
+        agentApi.getCommissionHistory()
       ]);
       setStats(statsData);
       setWithdrawals(withdrawalsData);
+      setCommissions(commissionsData);
     } catch (err) {
       console.error('Error fetching data:', err);
       toast.error('Failed to load earnings data');
@@ -75,7 +78,7 @@ export const AgentEarnings = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <Card className="p-6">
           <div className="flex items-center">
             <div className="p-3 rounded-full bg-blue-100 dark:bg-blue-900">
@@ -83,9 +86,9 @@ export const AgentEarnings = () => {
             </div>
             <div className="ml-4">
               <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                Total Earned
+                Total Commission
               </p>
-              <h3 className="text-2xl font-bold">${stats.totalEarned.toLocaleString()}</h3>
+              <h3 className="text-2xl font-bold">${stats.commissionEarned.toLocaleString()}</h3>
             </div>
           </div>
         </Card>
@@ -106,8 +109,8 @@ export const AgentEarnings = () => {
 
         <Card className="p-6">
           <div className="flex items-center">
-            <div className="p-3 rounded-full bg-purple-100 dark:bg-purple-900">
-              <Clock className="h-6 w-6 text-purple-600 dark:text-purple-400" />
+            <div className="p-3 rounded-full bg-yellow-100 dark:bg-yellow-900">
+              <Clock className="h-6 w-6 text-yellow-600 dark:text-yellow-400" />
             </div>
             <div className="ml-4">
               <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
@@ -122,7 +125,50 @@ export const AgentEarnings = () => {
             </div>
           </div>
         </Card>
+
+        <Card className="p-6">
+          <div className="flex items-center">
+            <div className="p-3 rounded-full bg-purple-100 dark:bg-purple-900">
+              <CheckCircle className="h-6 w-6 text-purple-600 dark:text-purple-400" />
+            </div>
+            <div className="ml-4">
+              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                Total Balance
+              </p>
+              <h3 className="text-2xl font-bold">
+                ${stats.totalBalance.toLocaleString()}
+              </h3>
+            </div>
+          </div>
+        </Card>
       </div>
+
+      {/* Commission History */}
+      <Card className="p-6">
+        <h2 className="text-lg font-semibold mb-4">Commission History</h2>
+        <div className="space-y-4">
+          {commissions.map((commission) => (
+            <div
+              key={commission._id}
+              className="flex justify-between items-center p-4 bg-gray-50 dark:bg-gray-800 rounded-lg"
+            >
+              <div>
+                <p className="font-medium">${commission.amount.toLocaleString()}</p>
+                <p className="text-sm text-gray-600">
+                  {new Date(commission.createdAt).toLocaleDateString()}
+                </p>
+              </div>
+              <span className={`px-3 py-1 rounded-full text-sm ${
+                commission.status === 'Paid'
+                  ? 'bg-green-100 text-green-800'
+                  : 'bg-yellow-100 text-yellow-800'
+              }`}>
+                {commission.status}
+              </span>
+            </div>
+          ))}
+        </div>
+      </Card>
 
       {/* Withdrawal History */}
       <Card className="p-6">
@@ -139,17 +185,15 @@ export const AgentEarnings = () => {
                   {new Date(withdrawal.createdAt).toLocaleDateString()}
                 </p>
               </div>
-              <div>
-                <span className={`px-3 py-1 rounded-full text-sm ${
-                  withdrawal.status === 'Approved'
-                    ? 'bg-green-100 text-green-800'
-                    : withdrawal.status === 'Declined'
-                    ? 'bg-red-100 text-red-800'
-                    : 'bg-yellow-100 text-yellow-800'
-                }`}>
-                  {withdrawal.status}
-                </span>
-              </div>
+              <span className={`px-3 py-1 rounded-full text-sm ${
+                withdrawal.status === 'Approved'
+                  ? 'bg-green-100 text-green-800'
+                  : withdrawal.status === 'Rejected'
+                  ? 'bg-red-100 text-red-800'
+                  : 'bg-yellow-100 text-yellow-800'
+              }`}>
+                {withdrawal.status}
+              </span>
             </div>
           ))}
         </div>
@@ -163,13 +207,6 @@ export const AgentEarnings = () => {
               availableBalance={stats.availableBalance}
               onSubmit={handleWithdrawal}
             />
-            <Button 
-              variant="outline" 
-              onClick={() => setShowWithdrawalForm(false)}
-              className="mt-4 w-full"
-            >
-              Cancel
-            </Button>
           </div>
         </div>
       )}
@@ -181,13 +218,6 @@ export const AgentEarnings = () => {
             <PaymentMethodForm
               onSubmit={handlePaymentMethodUpdate}
             />
-            <Button 
-              variant="outline" 
-              onClick={() => setShowPaymentForm(false)}
-              className="mt-4 w-full"
-            >
-              Cancel
-            </Button>
           </div>
         </div>
       )}

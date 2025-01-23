@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Plus, Search } from 'lucide-react';
 import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
+import { CreateApplicationForm } from '../../features/agent/components/CreateApplicationForm';
 import { agentApi } from '../../features/agent/api/agentApi';
 import toast from 'react-hot-toast';
 import type { Application } from '../../features/agent/types';
@@ -10,6 +11,7 @@ export const AgentApplications = () => {
   const [applications, setApplications] = useState<Application[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  const [showCreateForm, setShowCreateForm] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
@@ -30,14 +32,26 @@ export const AgentApplications = () => {
     }
   };
 
-  const handleStatusUpdate = async (id: string, status: string) => {
+  const handleCreateApplication = async (data: any) => {
     try {
-      await agentApi.updateApplication(id, status);
-      toast.success('Application status updated');
+      await agentApi.createApplication(data);
+      toast.success('Application created successfully');
+      setShowCreateForm(false);
       fetchApplications();
     } catch (err) {
-      console.error('Error updating application:', err);
-      toast.error('Failed to update application status');
+      console.error('Error creating application:', err);
+      toast.error('Failed to create application');
+    }
+  };
+
+  const handleCreateOtraRequest = async (applicationId: string, amount: number, reason: string) => {
+    try {
+      await agentApi.createOtraRequest({ applicationId, amount, reason });
+      toast.success('OTRA request submitted successfully');
+      fetchApplications();
+    } catch (err) {
+      console.error('Error creating OTRA request:', err);
+      toast.error('Failed to submit OTRA request');
     }
   };
 
@@ -61,7 +75,7 @@ export const AgentApplications = () => {
             />
             <Search className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
           </div>
-          <Button>
+          <Button onClick={() => setShowCreateForm(true)}>
             <Plus className="h-5 w-5 mr-2" />
             New Application
           </Button>
@@ -88,15 +102,15 @@ export const AgentApplications = () => {
                           </p>
                         </div>
                         <div className="flex items-center space-x-4">
-                          <select
-                            value={service.status}
-                            onChange={(e) => handleStatusUpdate(application._id, e.target.value)}
-                            className="p-1 border rounded"
-                          >
-                            <option value="Pending">Pending</option>
-                            <option value="Approved">Approved</option>
-                            <option value="Rejected">Rejected</option>
-                          </select>
+                          <span className={`px-2 py-1 text-xs rounded-full ${
+                            service.status === 'Approved' 
+                              ? 'bg-green-100 text-green-800'
+                              : service.status === 'Rejected'
+                              ? 'bg-red-100 text-red-800'
+                              : 'bg-yellow-100 text-yellow-800'
+                          }`}>
+                            {service.status}
+                          </span>
                           <span className={`px-2 py-1 text-xs rounded-full ${
                             service.paymentStatus === 'Completed'
                               ? 'bg-green-100 text-green-800'
@@ -131,6 +145,19 @@ export const AgentApplications = () => {
               ))}
             </div>
           )}
+        </div>
+      )}
+
+      {/* Create Application Modal */}
+      {showCreateForm && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <CreateApplicationForm
+              onSubmit={handleCreateApplication}
+              onCancel={() => setShowCreateForm(false)}
+              isLoading={loading}
+            />
+          </div>
         </div>
       )}
     </div>

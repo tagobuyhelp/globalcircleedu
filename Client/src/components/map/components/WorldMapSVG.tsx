@@ -17,7 +17,7 @@ export const WorldMapSVG: React.FC<WorldMapSVGProps> = ({
     <svg
       viewBox="0 0 1000 500"
       className="w-full h-full"
-      style={{ backgroundColor: '#004e9a' }}
+      style={{ backgroundColor: 'rgb(243 243 243)' }}
     >
       {/* Background Grid */}
       <defs>

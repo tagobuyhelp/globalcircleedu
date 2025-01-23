@@ -2,7 +2,7 @@ import { Testimonial } from "../models/testimonial.model.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiResponse } from "../utils/apiResponse.js";
 import { ApiError } from "../utils/apiError.js";
-import { cloudinaryUpload } from '../utils/cloudinaryUpload.js';
+import uploadToCloudinary from '../utils/uploadToCloudinary.js';
 
 // Add a new testimonial
 export const addTestimonial = asyncHandler(async (req, res) => {
@@ -10,7 +10,7 @@ export const addTestimonial = asyncHandler(async (req, res) => {
 
     let imageUrl;
     if (req.file) {
-        const result = await cloudinaryUpload(req.file);
+        const result = await uploadToCloudinary(req.file);
         imageUrl = result.url;
     }
 
@@ -59,7 +59,7 @@ export const updateTestimonial = asyncHandler(async (req, res) => {
     }
 
     if (req.file) {
-        const result = await cloudinaryUpload(req.file);
+        const result = await uploadToCloudinary(req.file);
         existingTestimonial.image = result.url;
     }
 

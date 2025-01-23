@@ -6,7 +6,7 @@ import {
     updateTestimonial,
     deleteTestimonial
 } from '../controllers/testimonial.controller.js';
-import { upload } from '../middleware/multer.middleware.js';
+import { uploadSinglePhoto } from '../middleware/photoUpload.middleware.js';
 import { protect, authorize } from '../middleware/auth.middleware.js';
 
 const router = Router();
@@ -19,8 +19,8 @@ router.get('/:id', getTestimonialById);
 router.use(protect);
 
 // Admin only routes
-router.post('/', authorize('admin', 'administrator'), upload.single('image'), addTestimonial);
-router.patch('/:id', authorize('admin', 'administrator'), upload.single('image'), updateTestimonial);
+router.post('/', authorize('admin', 'administrator'), uploadSinglePhoto, addTestimonial);
+router.patch('/:id', authorize('admin', 'administrator'), uploadSinglePhoto, updateTestimonial);
 router.delete('/:id', authorize('admin', 'administrator'), deleteTestimonial);
 
 export default router;

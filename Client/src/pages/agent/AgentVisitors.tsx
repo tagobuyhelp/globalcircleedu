@@ -119,16 +119,18 @@ export const AgentVisitors = () => {
       {/* Create Visitor Modal */}
       {showCreateForm && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-md">
-            <h2 className="text-xl font-bold mb-4">Add New Visitor</h2>
-            <CreateVisitorForm onSubmit={handleCreateVisitor} />
-            <Button 
-              variant="outline" 
-              onClick={() => setShowCreateForm(false)}
-              className="mt-4 w-full"
-            >
-              Cancel
-            </Button>
+          <div className="w-full max-w-[40rem] mx-auto">
+            <Card className="p-6">
+              <h2 className="text-xl font-bold mb-4">Add New Visitor</h2>
+              <CreateVisitorForm onSubmit={handleCreateVisitor} />
+              <Button 
+                variant="outline" 
+                onClick={() => setShowCreateForm(false)}
+                className="mt-4 w-full"
+              >
+                Cancel
+              </Button>
+            </Card>
           </div>
         </div>
       )}
