@@ -8,7 +8,7 @@ import {
     getRelatedNews 
 } from '../controllers/news.controller.js';
 import { protect, authorize } from '../middleware/auth.middleware.js';
-import { uploadSinglePhoto } from '../middleware/photoUpload.middleware.js';
+import { uploadMixedFiles} from '../middleware/photoUpload.middleware.js';
 
 const router = express.Router();
 
@@ -25,12 +25,12 @@ router.get('/news/:id/related', getRelatedNews);
 router.use(protect);
 
 // Create a new news (admin only)
-router.post('/create', authorize('admin', 'administrator'), uploadSinglePhoto, createNews);
+router.post('/create', authorize('admin', 'administrator'), uploadMixedFiles, createNews);
 
 
 
 // Update a news by ID (admin only)
-router.put('/news/:id', authorize('admin', 'administrator'), uploadSinglePhoto, updateNews);
+router.put('/news/:id', authorize('admin', 'administrator'), uploadMixedFiles, updateNews);
 
 // Delete a news by ID (admin only)
 router.delete('/news/:id', authorize('admin', 'administrator'), deleteNews);

@@ -2,9 +2,7 @@ import { News } from "../models/news.model.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiResponse } from "../utils/apiResponse.js";
 import { ApiError } from "../utils/apiError.js";
-import { getPhotoPath } from '../middleware/photoUpload.middleware.js';
-
-const BASE_URL = process.env.BASE_URL || "http://localhost:5000";
+import uploadToCloudinary from '../utils/uploadToCloudinary.js';
 
 // Create News
 export const createNews = asyncHandler(async (req, res) => {
@@ -15,9 +13,9 @@ export const createNews = asyncHandler(async (req, res) => {
     }
 
     let imageUrl;
-    if (req.file) {
-        const result = await cloudinaryUpload(req.file);
-        imageUrl = result.url;
+    if (req.files.imageUrl) {
+        const result = await uploadToCloudinary(req.files.imageUrl[0]);
+        news.imageUrl = result.url;
     }
 
     const news = await News.create({
@@ -96,6 +94,7 @@ export const getNewsById = asyncHandler(async (req, res) => {
 });
 
 // Update News
+// Update News
 export const updateNews = asyncHandler(async (req, res) => {
     let news = await News.findById(req.params.id);
 
@@ -103,16 +102,17 @@ export const updateNews = asyncHandler(async (req, res) => {
         throw new ApiError(404, "News not found");
     }
 
-    const { title, content, author } = req.body;
+    const { title, content, author, category } = req.body;
 
-    if (req.file) {
-        const result = await cloudinaryUpload(req.file);
+    if (req.files.imageUrl) {
+        const result = await uploadToCloudinary(req.files.imageUrl[0]);
         news.imageUrl = result.url;
     }
 
     news.title = title || news.title;
     news.content = content || news.content;
     news.author = author || news.author;
+    news.category = category || news.category;
 
     news = await news.save();
 

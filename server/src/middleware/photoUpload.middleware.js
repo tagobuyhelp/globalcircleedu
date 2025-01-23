@@ -28,7 +28,7 @@ const upload = multer({
     storage: storage,
     fileFilter: (req, file, cb) => {
         // Allow only image files (jpg, jpeg, png, gif) and PDF files
-        const allowedTypes = /jpeg|jpg|png|gif|pdf/;
+        const allowedTypes = /jpeg|jpg|png|gif|pdf|webp/;
         const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
         const mimetype = allowedTypes.test(file.mimetype);
 
@@ -56,6 +56,7 @@ export const uploadMixedFiles = upload.fields([
     { name: 'languageTests', maxCount: 1 },
     { name: 'logo', maxCount: 1 },
     { name: 'campusPhotos', maxCount: 5 },
+    { name: 'imageUrl', maxCount: 4 },
 ]);
 
 // Function to construct a valid photo URL or relative path
