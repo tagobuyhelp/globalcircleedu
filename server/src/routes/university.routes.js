@@ -14,6 +14,9 @@ const router = express.Router();
 // Get all universities (paginated)
 router.get('/', getAllUniversities);
 
+// Get a specific university by ID
+router.get('/:id', getUniversityById);
+
 // Protected routes
 router.use(protect);
 
@@ -22,8 +25,7 @@ router.post('/', authorize('admin', 'administrator'), uploadMixedFiles, createUn
 
 
 
-// Get a specific university by ID
-router.get('/:id', getUniversityById);
+
 
 // Update a university
 router.put('/:id', uploadMixedFiles, updateUniversity);
