@@ -94,21 +94,7 @@ app.use('/team-members', teamMemberRoutes);
 
 
 
-// Add this route before the catch-all handler
-app.get('/:filename', (req, res) => {
-    const { filename } = req.params;
-    const filePath = `${process.cwd()}/images/photos/${filename}`;
-    console.log('Requested file:', filePath);
-    
-    res.sendFile(filePath, (err) => {
-        if (err) {
-            console.error('Error sending file:', err);
-            res.status(err.status || 500).json({ success: false, error: err.message });
-        } else {
-            console.log('File sent successfully:', filePath);
-        }
-    });
-});
+
 // Catch-all for unhandled routes
 app.use('*', (req, res, next) => {
     const error = new Error(`Not Found - ${req.originalUrl}`);

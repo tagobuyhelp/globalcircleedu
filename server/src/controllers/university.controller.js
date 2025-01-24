@@ -29,11 +29,11 @@ export const createUniversity = asyncHandler(async (req, res) => {
 
 export const getAllUniversities = asyncHandler(async (req, res) => {
     const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 100;
+    const limit =  100;
     const skip = (page - 1) * limit;
 
     const totalUniversities = await University.countDocuments();
-    const universities = await University.find().skip(skip).limit(limit);
+    const universities = await University.find()
 
 
     const totalPages = Math.ceil(totalUniversities / limit);
