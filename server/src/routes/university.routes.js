@@ -11,14 +11,16 @@ import {
 
 const router = express.Router();
 
+// Get all universities (paginated)
+router.get('/', getAllUniversities);
+
 // Protected routes
 router.use(protect);
 
 // Create a new university
 router.post('/', authorize('admin', 'administrator'), uploadMixedFiles, createUniversity);
 
-// Get all universities (paginated)
-router.get('/', getAllUniversities);
+
 
 // Get a specific university by ID
 router.get('/:id', getUniversityById);
