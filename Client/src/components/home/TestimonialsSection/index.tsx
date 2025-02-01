@@ -4,37 +4,52 @@ import { TestimonialCard } from './TestimonialCard';
 
 const testimonials = [
   {
-    name: "Sarah Johnson",
-    role: "Masters Student at MIT",
-    testimonial: "Global Circle Edu made my dream of studying at MIT a reality. Their guidance throughout the application process was invaluable.",
+    name: "Dr. Sannidhya Acharyya",
+    role: "Diploma Holder",
+    testimonial: "The guidance and mentorship I received were exceptional. It played a crucial role in shaping my career path.",
     rating: 5,
-    image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80",
+    image: "https://res.cloudinary.com/dttifrbaa/image/upload/v1737982665/GCE/hpityuuoraryqocxnfel.jpg",
     videoUrl: "https://www.youtube.com/watch?v=example1"
   },
   {
-    name: "Michael Chen",
-    role: "PhD Candidate at Oxford",
-    testimonial: "The personalized attention and expert advice helped me secure a full scholarship. I couldn't have done it without their support.",
+    name: "Dr. Sandipan Roy",
+    role: "Medical Professional",
+    testimonial: "Their support helped me navigate the complexities of medical education. I am grateful for their invaluable assistance.",
     rating: 5,
-    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80",
+    image: "https://res.cloudinary.com/dttifrbaa/image/upload/v1737983073/GCE/sm7r1syjp04at8r99w8z.jpg",
     videoUrl: "https://www.youtube.com/watch?v=example2"
   },
   {
-    name: "Emma Thompson",
-    role: "MBA Graduate from Harvard",
-    testimonial: "Their extensive network and industry connections opened doors I never thought possible. The career guidance was exceptional.",
+    name: "Dr. Kaushlendra Pradip Singh",
+    role: "M.B.B.S. Graduate",
+    testimonial: "From admission guidance to career counseling, their expert team ensured I was on the right track every step of the way.",
     rating: 5,
-    image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&q=80",
+    image: "https://res.cloudinary.com/dttifrbaa/image/upload/v1737982659/GCE/jiyxarajc25feo5kw2ue.jpg",
     videoUrl: "https://www.youtube.com/watch?v=example3"
   },
   {
-    name: "David Kim",
-    role: "Software Engineer at Google",
-    testimonial: "From visa assistance to job placement, they were there every step of the way. A truly comprehensive service.",
+    name: "Dr. Anjali Narayanaswami",
+    role: "Healthcare Specialist",
+    testimonial: "The personalized approach and dedication of the team made all the difference in my academic and professional journey.",
     rating: 5,
-    image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80"
+    image: "https://res.cloudinary.com/dttifrbaa/image/upload/v1737982882/GCE/dbqpcourrptixtrggip3.jpg"
+  },
+  {
+    name: "Dr. Sarika Rana",
+    role: "Medical Consultant",
+    testimonial: "Their expertise in career planning and academic guidance helped me achieve my goals efficiently and confidently.",
+    rating: 5,
+    image: "https://res.cloudinary.com/dttifrbaa/image/upload/v1737983271/GCE/whmscmm0muhh81mpykt1.jpg"
+  },
+  {
+    name: "Tushar Tripathi",
+    role: "Aspiring Medical Student",
+    testimonial: "Thanks to their professional insights and structured approach, I was able to secure my admission with ease.",
+    rating: 5,
+    image: "https://res.cloudinary.com/dttifrbaa/image/upload/v1737982750/GCE/esnraw8dqtsxgsn3azxn.jpg"
   }
 ];
+
 
 export const TestimonialsSection = () => {
   const [activeIndex, setActiveIndex] = useState(0);

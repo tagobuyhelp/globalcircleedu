@@ -9,7 +9,7 @@ const teamMembers = [
   {
     name: 'Dr. Ratan Kumar Gupta',
     role: 'General Manager',
-    image: 'https://res.cloudinary.com/dttifrbaa/image/upload/v1737708457/Dr_Ratan_Kumar_Gupta_taw14h.jpg',
+    image: 'https://res.cloudinary.com/dttifrbaa/image/upload/v1737992723/GCE/oq66vicoxpswalm8byay.png',
     expertise: 'Management & Operations',
     description: 'Dr. Gupta brings extensive experience in business management, ensuring smooth operational efficiency.',
     linkedin: '#',
@@ -20,7 +20,7 @@ const teamMembers = [
   {
     name: 'Gargi Guha Roy',
     role: 'Administrative & Operational Manager',
-    image: 'https://res.cloudinary.com/dttifrbaa/image/upload/v1737708458/Gargi_Guha_Roy_aedb6n.jpg',
+    image: 'https://res.cloudinary.com/dttifrbaa/image/upload/v1737992694/GCE/o786jiirv48hwhkh89fi.png',
     expertise: 'Administration & Operations',
     description: 'Gargi specializes in overseeing administrative functions and streamlining operational processes.',
     linkedin: '#',
@@ -31,7 +31,7 @@ const teamMembers = [
   {
     name: 'Mamata Pathak',
     role: 'Admission and Immigration Incharge',
-    image: 'https://res.cloudinary.com/dttifrbaa/image/upload/v1737708458/Mamata_Pathak_s35vu8.jpg',
+    image: 'https://res.cloudinary.com/dttifrbaa/image/upload/v1737992696/GCE/uhny8tanhfj2vkxtkyus.png',
     expertise: 'Admissions & Immigration',
     description: 'Mamata has a deep understanding of global immigration policies and student admission processes.',
     linkedin: '#',
@@ -42,7 +42,7 @@ const teamMembers = [
   {
     name: 'Abhik Majumder',
     role: 'International Language and Relations Head',
-    image: 'https://res.cloudinary.com/dttifrbaa/image/upload/v1737708457/Abhik_Majumder_zvmlia.jpg',
+    image: 'https://res.cloudinary.com/dttifrbaa/image/upload/v1738393354/GCE/dkfxv6k3ibysgcdmn4ml.png',
     expertise: 'Language & International Relations',
     description: 'Abhik leads our international language programs, fostering global collaboration.',
     linkedin: '#',
