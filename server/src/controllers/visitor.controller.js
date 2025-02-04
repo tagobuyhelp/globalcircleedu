@@ -115,6 +115,7 @@ export const getVisitorById = asyncHandler(async (req, res) => {
 export const updateVisitor = asyncHandler(async (req, res) => {
     const visitorId = req.params.id;
     let updateData = req.body;
+    console.log(updateData);
 
     // Find the existing visitor
     let visitor = await Visitor.findById(visitorId);

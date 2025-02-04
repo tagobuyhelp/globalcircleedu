@@ -1,15 +1,13 @@
-// src/components/layout/MobileMenu.tsx
 import React, { useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { 
-  X, ChevronRight, Moon, Sun, 
-  UserCircle, LogOut, LayoutDashboard, 
-  LogIn, UserPlus 
+  X, ChevronRight, UserCircle, LogOut, 
+  LayoutDashboard, LogIn, UserPlus, MessageSquare 
 } from 'lucide-react';
 import { cn } from '../../utils/cn';
 import { Button } from '../ui/Button';
 import { useAuthStore } from '../../store/authStore';
-import { useThemeStore } from '../../store/themeStore';
+import { useChat } from '../../features/chat/hooks/useChat';
 
 interface MobileMenuProps {
   isOpen: boolean;
@@ -24,7 +22,7 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({
 }) => {
   const location = useLocation();
   const { isAuthenticated, user, logout } = useAuthStore();
-  const { isDarkMode, toggleTheme } = useThemeStore();
+  const { openChat } = useChat();
 
   // Prevent body scroll when menu is open
   useEffect(() => {
@@ -58,14 +56,14 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({
   return (
     <div
       className={cn(
-        'fixed inset-0 z-50 transform transition-all duration-500 ease-in-out',
+        'fixed inset-0 z-50 transform transition-all duration-300 ease-in-out',
         isOpen ? 'translate-x-0' : 'translate-x-full'
       )}
     >
       {/* Backdrop with blur effect */}
       <div 
         className={cn(
-          'absolute inset-0 bg-black/50 backdrop-blur-sm transition-opacity duration-500',
+          'absolute inset-0 bg-black/50 backdrop-blur-sm transition-opacity duration-300',
           isOpen ? 'opacity-100' : 'opacity-0'
         )}
         onClick={onClose}
@@ -75,7 +73,7 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({
       <div 
         className={cn(
           'absolute right-0 top-0 h-full w-[80%] max-w-sm bg-white dark:bg-gray-800 shadow-xl',
-          'transform transition-transform duration-500 ease-out',
+          'transform transition-transform duration-300 ease-out',
           isOpen ? 'translate-x-0' : 'translate-x-full'
         )}
       >
@@ -86,10 +84,26 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({
             <button
               onClick={onClose}
               className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-colors"
+              aria-label="Close menu"
             >
               <X className="h-6 w-6" />
             </button>
           </div>
+
+          {/* User Profile Section */}
+          {isAuthenticated && (
+            <div className="p-4 bg-gradient-to-r from-[#004e9a] to-[#f37021] text-white">
+              <div className="flex items-center space-x-3">
+                <div className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                  <UserCircle className="w-8 h-8" />
+                </div>
+                <div>
+                  <h3 className="font-medium">{user?.name}</h3>
+                  <p className="text-sm text-white/80">{user?.email}</p>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Navigation Links */}
           <div className="flex-1 overflow-y-auto py-4">
@@ -124,72 +138,51 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({
               })}
             </nav>
 
-            <div className="border-t my-4 dark:border-gray-700" />
-
-            {/* Theme Toggle */}
-            <div className="px-4">
-              <button
-                onClick={() => {
-                  toggleTheme();
-                  onClose();
-                }}
-                className="flex items-center justify-between w-full px-3 py-2 rounded-lg text-sm font-medium hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-              >
-                <div className="flex items-center space-x-3">
-                  {isDarkMode ? (
-                    <Sun className="h-5 w-5 text-amber-500" />
-                  ) : (
-                    <Moon className="h-5 w-5 text-slate-900 dark:text-slate-100" />
-                  )}
-                  <span>Theme</span>
-                </div>
-                <div className="w-9 h-5 bg-gray-200 dark:bg-gray-700 rounded-full relative transition-colors">
-                  <div className={cn(
-                    "absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform",
-                    isDarkMode && "translate-x-4"
-                  )} />
-                </div>
-              </button>
-            </div>
+            {/* Chat Support */}
+            {isAuthenticated && (
+              <div className="px-4 mt-4">
+                <button
+                  onClick={() => {
+                    openChat(user.id);
+                    onClose();
+                  }}
+                  className="flex items-center space-x-3 w-full px-3 py-2 rounded-lg text-sm font-medium text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors"
+                >
+                  <MessageSquare className="h-5 w-5" />
+                  <span>Live Chat Support</span>
+                </button>
+              </div>
+            )}
           </div>
 
-          {/* Auth Section */}
-          <div className="p-4 border-t dark:border-gray-700">
+          {/* Auth Actions */}
+          <div className="p-4 border-t dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50">
             {isAuthenticated ? (
-              <div className="space-y-4">
-                <div className="flex items-center space-x-3 px-3">
-                  <UserCircle className="h-8 w-8 text-gray-400" />
-                  <div className="text-sm">
-                    <p className="font-medium">{user?.name}</p>
-                    <p className="text-gray-500 dark:text-gray-400">{user?.email}</p>
-                  </div>
-                </div>
-                <div className="grid grid-cols-2 gap-2">
-                  <Link to={getDashboardLink()}>
-                    <Button
-                      variant="outline"
-                      className="w-full flex items-center justify-center space-x-2"
-                      onClick={onClose}
-                    >
-                      <LayoutDashboard className="h-4 w-4" />
-                      <span>{user?.role === 'visitor' ? 'My Profile' : 'Dashboard'}</span>
-                    </Button>
-                  </Link>
+              <div className="space-y-3">
+                <Link to={getDashboardLink()}>
                   <Button
-                    onClick={() => {
-                      logout();
-                      onClose();
-                    }}
-                    className="w-full flex items-center justify-center space-x-2 bg-red-600 hover:bg-red-700 text-white"
+                    variant="outline"
+                    className="w-full flex items-center justify-center space-x-2"
+                    onClick={onClose}
                   >
-                    <LogOut className="h-4 w-4" />
-                    <span>Logout</span>
+                    <LayoutDashboard className="h-4 w-4" />
+                    <span>{user?.role === 'visitor' ? 'My Profile' : 'Dashboard'}</span>
                   </Button>
-                </div>
+                </Link>
+                <Button
+                  onClick={() => {
+                    logout();
+                    onClose();
+                  }}
+                  className="w-full flex items-center justify-center space-x-2 bg-red-600 hover:bg-red-700 text-white"
+                >
+                  <LogOut className="h-4 w-4" />
+                  <span>Logout</span>
+                </Button>
               </div>
             ) : (
-              <div className="grid grid-cols-2 gap-2">
-                <Link to="/login">
+              <div className="grid grid-cols-2 gap-3">
+                <Link to="/login" className="w-full">
                   <Button
                     variant="outline"
                     className="w-full flex items-center justify-center space-x-2"
@@ -199,7 +192,7 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({
                     <span>Login</span>
                   </Button>
                 </Link>
-                <Link to="/register">
+                <Link to="/register" className="w-full">
                   <Button 
                     className="w-full flex items-center justify-center space-x-2 bg-[#004e9a] hover:bg-[#003d7a] text-white" 
                     onClick={onClose}

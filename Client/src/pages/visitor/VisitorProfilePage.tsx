@@ -17,11 +17,15 @@ export const VisitorProfilePage = () => {
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        if (!user?.id) return;
+        if (!user?.id) {
+          setError('User not found');
+          return;
+        }
         const data = await visitorApi.getById(user.id);
         
         // Parse stringified JSON fields
@@ -35,7 +39,7 @@ export const VisitorProfilePage = () => {
         setProfile(parsedData);
       } catch (error) {
         console.error('Error fetching profile:', error);
-        toast.error('Failed to load profile');
+        setError('Failed to load profile');
       } finally {
         setLoading(false);
       }
@@ -46,65 +50,14 @@ export const VisitorProfilePage = () => {
 
   const handleUpdate = async (formData: FormData) => {
     try {
-      if (!user?.id) return;
+      if (!user?.id) {
+        toast.error('User not found');
+        return;
+      }
       
       const loadingToast = toast.loading('Updating profile...');
       
-      // Create an object to store only modified fields
-      const updates: Record<string, any> = {};
-      
-      // Handle nested objects that need to be stringified
-      const jsonFields = ['address', 'education', 'professional'];
-      const nestedData: Record<string, any> = {};
-      
-      for (const [key, value] of formData.entries()) {
-        if (value === '' || value === null || value === undefined) continue;
-        
-        if (key.includes('.')) {
-          const [parent, child] = key.split('.');
-          if (jsonFields.includes(parent)) {
-            nestedData[parent] = nestedData[parent] || {};
-            nestedData[parent][child] = value;
-          } else {
-            updates[key] = value;
-          }
-        } else {
-          updates[key] = value;
-        }
-      }
-
-      // Stringify nested objects
-      for (const field of jsonFields) {
-        if (Object.keys(nestedData[field] || {}).length > 0) {
-          updates[field] = JSON.stringify(nestedData[field]);
-        }
-      }
-
-      // Handle file uploads
-      const fileFields = ['profilePicture', 'documents.identityDocument', 'documents.transcript', 
-                         'documents.workExperience', 'documents.languageTests'];
-      
-      for (const field of fileFields) {
-        const file = formData.get(field) as File;
-        if (file && file.size > 0) {
-          updates[field] = file;
-        }
-      }
-
-      // Preserve special fields
-      if (profile.interestedCourse) {
-        updates.interestedCourse = profile.interestedCourse._id || profile.interestedCourse;
-      }
-      if (profile.interestedJob) {
-        updates.interestedJob = profile.interestedJob._id || profile.interestedJob;
-      }
-
-      const updatedFormData = new FormData();
-      for (const [key, value] of Object.entries(updates)) {
-        updatedFormData.append(key, value);
-      }
-
-      await visitorApi.update(user.id, updatedFormData);
+      await visitorApi.update(user.id, formData);
       
       toast.dismiss(loadingToast);
       toast.success('Profile updated successfully');
@@ -128,13 +81,23 @@ export const VisitorProfilePage = () => {
     );
   }
 
-  if (!profile) {
+  // Show profile creation form if no profile exists
+  if (!profile || error) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <h2 className="text-xl font-semibold mb-2">Profile Not Found</h2>
-          <p className="text-gray-600 dark:text-gray-400">Please complete your profile setup.</p>
-        </div>
+      <div className="max-w-4xl mx-auto px-4 py-8">
+        <Card className="p-6">
+          <div className="text-center mb-6">
+            <h2 className="text-2xl font-bold">Complete Your Profile</h2>
+            <p className="text-gray-600 dark:text-gray-400 mt-2">
+              Please complete your profile to continue
+            </p>
+          </div>
+          <VisitorProfileForm
+            visitorType="Student"
+            onSubmit={handleUpdate}
+            isLoading={loading}
+          />
+        </Card>
       </div>
     );
   }

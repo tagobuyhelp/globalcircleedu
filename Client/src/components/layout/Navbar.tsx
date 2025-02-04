@@ -2,17 +2,16 @@ import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../../store/authStore';
 import { 
-  Menu, Moon, Sun, Home, BookOpen, 
+  Menu, Home, BookOpen, 
   Building2, Briefcase, Newspaper, Settings
 } from 'lucide-react';
 import { Button } from '../ui/Button';
-import { useThemeStore } from '../../store/themeStore';
 import { Logo } from '../ui/Logo';
+import { MobileMenu } from './MobileMenu';
 
 export const Navbar = () => {
   const location = useLocation();
   const { isAuthenticated, user, logout } = useAuthStore();
-  const { isDarkMode, toggleTheme } = useThemeStore();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const navItems = [
@@ -54,18 +53,6 @@ export const Navbar = () => {
               );
             })}
 
-            <button
-              onClick={toggleTheme}
-              className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
-              aria-label="Toggle theme"
-            >
-              {isDarkMode ? (
-                <Sun className="h-5 w-5 text-gray-500 dark:text-gray-400" />
-              ) : (
-                <Moon className="h-5 w-5 text-gray-500" />
-              )}
-            </button>
-
             {isAuthenticated ? (
               <div className="flex items-center space-x-4">
                 <Link
@@ -91,8 +78,9 @@ export const Navbar = () => {
           {/* Mobile menu button */}
           <div className="md:hidden flex items-center">
             <button
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
+              onClick={() => setIsMobileMenuOpen(true)}
+              className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+              aria-label="Open menu"
             >
               <Menu className="h-6 w-6" />
             </button>
@@ -100,86 +88,12 @@ export const Navbar = () => {
         </div>
       </div>
 
-      {/* Mobile menu */}
-      {isMobileMenuOpen && (
-        <div className="md:hidden">
-          <div className="px-2 pt-2 pb-3 space-y-1">
-            {navItems.map((item) => {
-              const Icon = item.icon;
-              return (
-                <Link
-                  key={item.path}
-                  to={item.path}
-                  className={`block px-3 py-2 rounded-md text-base font-medium flex items-center space-x-2 ${
-                    isActive(item.path)
-                      ? 'text-[#004e9a] bg-blue-50 dark:bg-blue-900/20 dark:text-blue-400'
-                      : 'text-gray-600 hover:text-[#004e9a] dark:text-gray-300 dark:hover:text-blue-400'
-                  }`}
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  <Icon className="h-5 w-5" />
-                  <span>{item.label}</span>
-                </Link>
-              );
-            })}
-
-            <div className="pt-4 pb-3 border-t border-gray-200 dark:border-gray-700">
-              <div className="flex items-center px-3">
-                <button
-                  onClick={toggleTheme}
-                  className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
-                >
-                  {isDarkMode ? (
-                    <Sun className="h-5 w-5 text-gray-500 dark:text-gray-400" />
-                  ) : (
-                    <Moon className="h-5 w-5 text-gray-500" />
-                  )}
-                </button>
-              </div>
-
-              <div className="mt-3 space-y-2">
-                {isAuthenticated ? (
-                  <>
-                    <Link
-                      to={user?.role === 'visitor' ? '/dashboard/visitor/profile' : '/dashboard'}
-                      className="block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:text-[#004e9a] dark:text-gray-300"
-                      onClick={() => setIsMobileMenuOpen(false)}
-                    >
-                      {user?.role === 'visitor' ? 'My Profile' : 'Dashboard'}
-                    </Link>
-                    <button
-                      onClick={() => {
-                        logout();
-                        setIsMobileMenuOpen(false);
-                      }}
-                      className="w-full text-left px-3 py-2 rounded-md text-base font-medium text-red-600 hover:text-red-700 dark:text-red-400"
-                    >
-                      Logout
-                    </button>
-                  </>
-                ) : (
-                  <>
-                    <Link
-                      to="/login"
-                      className="block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:text-[#004e9a] dark:text-gray-300"
-                      onClick={() => setIsMobileMenuOpen(false)}
-                    >
-                      Login
-                    </Link>
-                    <Link
-                      to="/register"
-                      className="block px-3 py-2 rounded-md text-base font-medium text-[#004e9a] hover:text-[#003d7a] dark:text-blue-400"
-                      onClick={() => setIsMobileMenuOpen(false)}
-                    >
-                      Register
-                    </Link>
-                  </>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Mobile Menu */}
+      <MobileMenu
+        isOpen={isMobileMenuOpen}
+        onClose={() => setIsMobileMenuOpen(false)}
+        navItems={navItems}
+      />
     </nav>
   );
 };

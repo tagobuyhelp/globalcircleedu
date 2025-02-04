@@ -12,36 +12,36 @@ export const featuredData: Feature[] = [
         title: 'Master in Data Science',
         institution: 'MIT',
         duration: '2 Years',
-        link: '/courses/master-data-science'
+        link: '/courses'
       },
       { 
         title: 'MBA',
         institution: 'Harvard',
         duration: '18 Months',
-        link: '/courses/mba-harvard'
+        link: '/courses'
       }
     ]
   },
   {
-    title: 'Top Universities',
-    icon: Building2,
-    color: 'blue',
-    viewAllLink: '/universities',
-    items: [
-      {
-        title: 'Massachusetts Institute of Technology',
-        location: 'USA',
-        ranking: '#1',
-        link: '/universities/mit'
-      },
-      {
-        title: 'University of Oxford',
-        location: 'UK',
-        ranking: '#2',
-        link: '/universities/oxford'
-      }
-    ]
-  },
+  title: 'Top Universities',
+  icon: Building2,
+  color: 'blue',
+  viewAllLink: '/universities',
+  items: [
+    {
+      title: 'Massachusetts Institute of Technology',
+      location: 'USA',
+      ranking: '#1',
+      link: '/universities/676c143ee7208ddfe19c78e3'
+    },
+    {
+      title: 'Moscow State University',
+      location: 'Russia',
+      ranking: '#1',
+      link: '/universities'
+    }
+  ]
+},
   {
     title: 'Latest Jobs',
     icon: Briefcase,
@@ -52,13 +52,13 @@ export const featuredData: Feature[] = [
         title: 'Senior Data Scientist',
         company: 'Google',
         location: 'USA',
-        link: '/jobs/senior-data-scientist'
+        link: '/jobs'
       },
       {
         title: 'Software Engineer',
         company: 'Microsoft',
         location: 'Canada',
-        link: '/jobs/software-engineer'
+        link: '/jobs'
       }
     ]
   },
@@ -70,13 +70,13 @@ export const featuredData: Feature[] = [
     items: [
       {
         title: 'New Scholarship Programs',
-        date: 'Dec 15, 2023',
-        link: '/news/new-scholarship-programs'
+        date: 'Jan 3, 2025',
+        link: '/news'
       },
       {
         title: 'Study Abroad Opportunities',
-        date: 'Dec 10, 2023',
-        link: '/news/study-abroad-opportunities'
+        date: 'Jan 2, 2025',
+        link: '/news'
       }
     ]
   }
