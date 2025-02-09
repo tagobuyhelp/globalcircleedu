@@ -50,10 +50,10 @@ export const uploadMultiplePhotos = upload.array('photos', 5); // Allow up to 5 
 // Middleware to handle multiple fields with different file types
 export const uploadMixedFiles = upload.fields([
     { name: 'profilePicture', maxCount: 1 },
-    { name: 'identityDocument', maxCount: 1 },
-    { name: 'transcript', maxCount: 1 },
-    { name: 'workExperience', maxCount: 1 },
-    { name: 'languageTests', maxCount: 1 },
+    { name: 'documents.identityDocument', maxCount: 1 },
+    { name: 'documents.transcript', maxCount: 1 },
+    { name: 'documents.workExperience', maxCount: 1 },
+    { name: 'documents.languageTests', maxCount: 1 },
     { name: 'logo', maxCount: 1 },
     { name: 'campusPhotos', maxCount: 5 },
     { name: 'imageUrl', maxCount: 4 },

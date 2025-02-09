@@ -20,4 +20,7 @@ export default defineConfig({
       },
     },
   },
+  preview: {
+    allowedHosts: ['globalcircleedu.com', 'localhost', '127.0.0.1']
+  }
 });
