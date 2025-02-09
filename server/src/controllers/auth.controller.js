@@ -10,7 +10,7 @@ import mongoose from 'mongoose';
 
 // Register user
 export const register = asyncHandler(async (req, res) => {
-    const { email, password, role, phone, name } = req.body;
+    const { email, password, role, phone, name, visitorType } = req.body;
     console.log(email, password, role, phone, name);
 
     // Define allowed roles
@@ -66,6 +66,7 @@ export const register = asyncHandler(async (req, res) => {
                 name,
                 email,
                 phone,
+                visitorType
             }], { session });
         } else if (role === 'agent') {
             await Agent.create([{

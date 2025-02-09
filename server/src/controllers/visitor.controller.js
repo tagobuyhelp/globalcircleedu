@@ -123,7 +123,7 @@ export const getVisitorById = asyncHandler(async (req, res) => {
 export const updateVisitor = asyncHandler(async (req, res) => {
     const visitorId = req.params.id;
     let updateData = req.body;
-    console.log("Update data:", updateData);
+
 
     // Find the existing visitor
     let visitor = await Visitor.findById(visitorId);
@@ -145,8 +145,7 @@ export const updateVisitor = asyncHandler(async (req, res) => {
 
 if (!updateData.documents) updateData.documents = {};
 
-// Log available file fields
-console.log('Uploaded files:', Object.keys(req.files || {}));
+
 
 for (const field of documentFields) {
     const fileField = `documents.${field}`; // Match how files are structured in req.files
@@ -163,7 +162,6 @@ for (const field of documentFields) {
 
         console.log(`Uploading file: ${file.originalname}`);
         const result = await uploadToCloudinary(file);
-        console.log('Upload result:', result);
 
         // Correctly extracting version from result URL
         const versionMatch = result.url.match(/\/v(\d+)\//);
@@ -172,7 +170,6 @@ for (const field of documentFields) {
         // Construct the Cloudinary URL with f_auto and q_auto parameters
         const optimizedUrl = result.url.replace(`/v${version}/`, `/f_auto,q_auto/v${version}/`);
 
-        console.log('Optimized URL:', optimizedUrl);
 
         // Update only the relevant document field
         updateData.documents[field] = {
