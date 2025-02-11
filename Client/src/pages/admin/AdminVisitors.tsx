@@ -34,6 +34,7 @@ export const AdminVisitors = () => {
     try {
       setLoading(true);
       const data = await visitorApi.getAll();
+      console.log(data);
       setVisitors(data.visitors);
     } catch (err) {
       console.error('Error fetching visitors:', err);

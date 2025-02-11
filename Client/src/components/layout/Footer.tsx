@@ -111,6 +111,10 @@ export const Footer = () => {
                 <Link to="/study/uk" className="hover:text-[#f37021]">UK</Link>
               </li>
               <li>
+                <Link to="/study/uae" className="hover:text-[#f37021]">UAE</Link>
+              </li>
+              
+              <li>
                 <Link to="/study/canada" className="hover:text-[#f37021]">Canada</Link>
               </li>
               <li>

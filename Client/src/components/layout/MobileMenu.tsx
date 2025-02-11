@@ -2,7 +2,8 @@ import React, { useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { 
   X, ChevronRight, UserCircle, LogOut, 
-  LayoutDashboard, LogIn, UserPlus, MessageSquare 
+  LayoutDashboard, LogIn, UserPlus, MessageSquare,
+  ChevronDown 
 } from 'lucide-react';
 import { cn } from '../../utils/cn';
 import { Button } from '../ui/Button';
@@ -12,7 +13,12 @@ import { useChat } from '../../features/chat/hooks/useChat';
 interface MobileMenuProps {
   isOpen: boolean;
   onClose: () => void;
-  navItems: Array<{ label: string; path: string; icon: React.ElementType }>;
+  navItems: Array<{
+    label: string;
+    path: string;
+    icon: React.ElementType;
+    children?: Array<{ label: string; path: string }>;
+  }>;
 }
 
 export const MobileMenu: React.FC<MobileMenuProps> = ({
@@ -23,6 +29,7 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({
   const location = useLocation();
   const { isAuthenticated, user, logout } = useAuthStore();
   const { openChat } = useChat();
+  const [expandedItem, setExpandedItem] = React.useState<string | null>(null);
 
   // Prevent body scroll when menu is open
   useEffect(() => {
@@ -111,6 +118,49 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({
               {navItems.map((item) => {
                 const Icon = item.icon;
                 const isActive = location.pathname === item.path;
+                const isExpanded = expandedItem === item.label;
+
+                if (item.children) {
+                  return (
+                    <div key={item.label}>
+                      <button
+                        onClick={() => setExpandedItem(isExpanded ? null : item.label)}
+                        className={cn(
+                          "flex items-center justify-between w-full px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200",
+                          "hover:bg-gray-100 dark:hover:bg-gray-700",
+                          isExpanded && "bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400"
+                        )}
+                      >
+                        <div className="flex items-center space-x-3">
+                          <Icon className={cn(
+                            "h-5 w-5",
+                            isExpanded ? "text-blue-600 dark:text-blue-400" : "text-gray-400"
+                          )} />
+                          <span>{item.label}</span>
+                        </div>
+                        <ChevronDown className={cn(
+                          "h-4 w-4 transition-transform",
+                          isExpanded && "rotate-180"
+                        )} />
+                      </button>
+                      {isExpanded && (
+                        <div className="mt-2 ml-6 space-y-1">
+                          {item.children.map((child) => (
+                            <Link
+                              key={child.path}
+                              to={child.path}
+                              className="block px-3 py-2 rounded-lg text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700"
+                              onClick={onClose}
+                            >
+                              {child.label}
+                            </Link>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  );
+                }
+
                 return (
                   <Link
                     key={item.path}

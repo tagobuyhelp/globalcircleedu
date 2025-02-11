@@ -8,6 +8,7 @@ import { TeamSection } from '../components/home/TeamSection';
 import { JourneySection } from '../components/home/JourneySection';
 import { TestimonialsSection } from '../components/home/TestimonialsSection';
 import { GlobalPresenceSection } from '../components/home/GlobalPresenceSection';
+import { StudyDestinationsSection } from '../components/home/StudyDestinationsSection';
 
 export const Home = () => {
   return (
@@ -21,6 +22,7 @@ export const Home = () => {
         <HeroSection />
         <FeaturedSection />
         <ServicesSection />
+        <StudyDestinationsSection />
         <TeamSection />
         <JourneySection />
         <TestimonialsSection />

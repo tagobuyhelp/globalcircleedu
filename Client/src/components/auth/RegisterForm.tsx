@@ -12,17 +12,29 @@ interface RegisterFormData {
   phone: string;
   password: string;
   role: string;
+  visitorType?: 'Student' | 'Worker';
 }
 
 export const RegisterForm = () => {
   const { register: registerUser, isLoading, error } = useRegister();
   const [showPassword, setShowPassword] = React.useState(false);
   const [countryCode, setCountryCode] = useState('+971');
-  const { register, handleSubmit, formState: { errors } } = useForm<RegisterFormData>();
+  const { register, handleSubmit, formState: { errors }, watch } = useForm<RegisterFormData>();
+
+  const selectedRole = watch('role');
 
   const onSubmit = async (data: RegisterFormData) => {
     const fullPhone = `${countryCode}${data.phone}`;
-    await registerUser({ ...data, phone: fullPhone });
+    try {
+      await registerUser({
+        ...data,
+        phone: fullPhone,
+        // Only include visitorType if role is visitor
+        ...(data.role === 'visitor' && { visitorType: data.visitorType })
+      });
+    } catch (err) {
+      console.error('Registration error:', err);
+    }
   };
 
   return (
@@ -67,7 +79,7 @@ export const RegisterForm = () => {
             id="email"
             type="email"
             autoComplete="email"
-            {...register('email', {
+            {...register('email', { 
               required: 'Email is required',
               pattern: {
                 value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
@@ -132,7 +144,7 @@ export const RegisterForm = () => {
             id="password"
             type={showPassword ? 'text' : 'password'}
             autoComplete="new-password"
-            {...register('password', {
+            {...register('password', { 
               required: 'Password is required',
               minLength: {
                 value: 8,
@@ -169,9 +181,10 @@ export const RegisterForm = () => {
           </div>
           <select
             id="role"
-            {...register('role', { required: 'Role is required' })}
+            {...register('role', { required: 'Please select your role' })}
             className="appearance-none block w-full pl-11 pr-4 py-3 rounded-lg text-base border border-gray-300 dark:border-gray-600 shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white transition-colors"
           >
+            <option value="">Select an option</option>
             <option value="visitor">Study & Work Abroad</option>
             <option value="agent">Become an Agent</option>
           </select>
@@ -180,6 +193,31 @@ export const RegisterForm = () => {
           <p className="mt-1.5 text-sm text-red-600">{errors.role.message}</p>
         )}
       </div>
+
+      {selectedRole === 'visitor' && (
+        <div>
+          <label htmlFor="visitorType" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+            Visitor Type
+          </label>
+          <div className="relative">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <UserCircle className="h-5 w-5 text-gray-400" />
+            </div>
+            <select
+              id="visitorType"
+              {...register('visitorType', { required: 'Please select visitor type' })}
+              className="appearance-none block w-full pl-11 pr-4 py-3 rounded-lg text-base border border-gray-300 dark:border-gray-600 shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white transition-colors"
+            >
+              <option value="">Select visitor type</option>
+              <option value="Student">Student</option>
+              <option value="Worker">Worker</option>
+            </select>
+          </div>
+          {errors.visitorType && (
+            <p className="mt-1.5 text-sm text-red-600">{errors.visitorType.message}</p>
+          )}
+        </div>
+      )}
 
       <div className="pt-2">
         <Button

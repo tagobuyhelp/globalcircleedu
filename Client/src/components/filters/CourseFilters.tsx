@@ -50,12 +50,12 @@ export const CourseFilters: React.FC<CourseFiltersProps> = ({
   };
 
   const FilterContent = () => (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <div>
-        <h4 className="text-sm font-medium mb-2">Degree Level</h4>
-        <div className="max-h-48 overflow-y-auto">
+        <h4 className="text-sm font-medium mb-4">Degree Level</h4>
+        <div className="space-y-3">
           {degrees.map((degree) => (
-            <label key={degree} className="flex items-center space-x-2 mb-2">
+            <label key={degree} className="flex items-center space-x-3">
               <input
                 type="checkbox"
                 checked={tempFilters.degree.includes(degree)}
@@ -67,19 +67,19 @@ export const CourseFilters: React.FC<CourseFiltersProps> = ({
                       : prev.degree.filter(d => d !== degree)
                   }));
                 }}
-                className="rounded border-gray-300"
+                className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
               />
-              <span className="text-sm">{degree}</span>
+              <span className="text-sm text-gray-700 dark:text-gray-300">{degree}</span>
             </label>
           ))}
         </div>
       </div>
 
       <div>
-        <h4 className="text-sm font-medium mb-2">Program</h4>
-        <div className="max-h-48 overflow-y-auto">
+        <h4 className="text-sm font-medium mb-4">Program</h4>
+        <div className="max-h-48 overflow-y-auto space-y-3">
           {programs.map((program) => (
-            <label key={program} className="flex items-center space-x-2 mb-2">
+            <label key={program} className="flex items-center space-x-3">
               <input
                 type="checkbox"
                 checked={tempFilters.program.includes(program)}
@@ -91,19 +91,19 @@ export const CourseFilters: React.FC<CourseFiltersProps> = ({
                       : prev.program.filter(p => p !== program)
                   }));
                 }}
-                className="rounded border-gray-300"
+                className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
               />
-              <span className="text-sm">{program}</span>
+              <span className="text-sm text-gray-700 dark:text-gray-300">{program}</span>
             </label>
           ))}
         </div>
       </div>
 
       <div>
-        <h4 className="text-sm font-medium mb-2">Country</h4>
-        <div className="max-h-48 overflow-y-auto">
+        <h4 className="text-sm font-medium mb-4">Country</h4>
+        <div className="max-h-48 overflow-y-auto space-y-3">
           {countries.map((country) => (
-            <label key={country} className="flex items-center space-x-2 mb-2">
+            <label key={country} className="flex items-center space-x-3">
               <input
                 type="checkbox"
                 checked={tempFilters.country.includes(country)}
@@ -115,46 +115,48 @@ export const CourseFilters: React.FC<CourseFiltersProps> = ({
                       : prev.country.filter(c => c !== country)
                   }));
                 }}
-                className="rounded border-gray-300"
+                className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
               />
-              <span className="text-sm">{country}</span>
+              <span className="text-sm text-gray-700 dark:text-gray-300">{country}</span>
             </label>
           ))}
         </div>
       </div>
 
       <div>
-        <h4 className="text-sm font-medium mb-2">Mode</h4>
-        {['Online', 'Offline', 'Hybrid'].map((mode) => (
-          <label key={mode} className="flex items-center space-x-2 mb-2">
-            <input
-              type="checkbox"
-              checked={tempFilters.mode.includes(mode as any)}
-              onChange={(e) => {
-                setTempFilters(prev => ({
-                  ...prev,
-                  mode: e.target.checked
-                    ? [...prev.mode, mode as any]
-                    : prev.mode.filter(m => m !== mode)
-                }));
-              }}
-              className="rounded border-gray-300"
-            />
-            <span className="text-sm">{mode}</span>
-          </label>
-        ))}
+        <h4 className="text-sm font-medium mb-4">Mode</h4>
+        <div className="space-y-3">
+          {['Online', 'Offline', 'Hybrid'].map((mode) => (
+            <label key={mode} className="flex items-center space-x-3">
+              <input
+                type="checkbox"
+                checked={tempFilters.mode.includes(mode as any)}
+                onChange={(e) => {
+                  setTempFilters(prev => ({
+                    ...prev,
+                    mode: e.target.checked
+                      ? [...prev.mode, mode as any]
+                      : prev.mode.filter(m => m !== mode)
+                  }));
+                }}
+                className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+              />
+              <span className="text-sm text-gray-700 dark:text-gray-300">{mode}</span>
+            </label>
+          ))}
+        </div>
       </div>
 
       <div>
+        <h4 className="text-sm font-medium mb-4">Fee Range ($/yr)</h4>
         <RangeSlider
-          label="Fee Range ($/yr)"
           min={0}
           max={100000}
           value={tempFilters.feeRange}
           onChange={(value) => {
             setTempFilters(prev => ({
               ...prev,
-              feeRange: value
+              feeRange: value as [number, number]
             }));
           }}
           step={1000}
@@ -163,7 +165,6 @@ export const CourseFilters: React.FC<CourseFiltersProps> = ({
     </div>
   );
 
-  // For mobile drawer
   if (isOpen) {
     return (
       <FilterDrawer
@@ -177,25 +178,18 @@ export const CourseFilters: React.FC<CourseFiltersProps> = ({
     );
   }
 
-  // For desktop sidebar
   return (
-    <Card className="p-4">
-      <h3 className="font-semibold mb-4">Filters</h3>
-      <FilterContent />
-      <div className="mt-6 space-y-2">
-        <button
-          onClick={() => onFilterChange(tempFilters)}
-          className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-        >
-          Apply Filters
-        </button>
+    <Card className="p-6">
+      <div className="flex items-center justify-between mb-6">
+        <h3 className="text-lg font-semibold">Filters</h3>
         <button
           onClick={handleReset}
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 dark:border-gray-600 dark:hover:bg-gray-700"
+          className="text-sm text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
         >
-          Reset
+          Reset All
         </button>
       </div>
+      <FilterContent />
     </Card>
   );
 };

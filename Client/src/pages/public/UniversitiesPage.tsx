@@ -1,14 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, Filter } from 'lucide-react';
+import { Search, Filter, Building2 } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
-import { Footer } from '../../components/layout/Footer';
-import { LoadingSpinner } from '../../components/ui/LoadingSpinner';
 import { UniversityGrid } from '../../features/universities/components/UniversityGrid';
 import { UniversityFilters } from '../../features/universities/components/UniversityFilters';
+import { Footer } from '../../components/layout/Footer';
+import { universityApi } from '../../features/universities/api/universityApi';
 import { useFilters } from '../../hooks/useFilters';
 import { useViewToggle } from '../../hooks/useViewToggle';
-import { universityApi } from '../../features/universities/api/universityApi';
 import type { University } from '../../features/universities/types/university';
 
 const initialFilters = {
@@ -51,11 +50,6 @@ export const UniversitiesPage = () => {
     fetchUniversities();
   }, []);
 
-  const handleUniversitySelect = (id: string) => {
-    console.log('Navigating to university:', id);
-    navigate(`/universities/${id}`);
-  };
-
   const filteredUniversities = universities.filter(university => {
     const matchesSearch = university.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          university.country.toLowerCase().includes(searchTerm.toLowerCase());
@@ -76,65 +70,108 @@ export const UniversitiesPage = () => {
            matchesRanking && matchesAcceptance;
   });
 
-  if (loading) return <LoadingSpinner message="Loading universities..." />;
-  if (error) return <div className="text-red-600">{error}</div>;
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-red-600 text-lg mb-4">{error}</p>
+          <Button onClick={() => window.location.reload()}>Try Again</Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-2xl font-bold">Universities</h1>
-          
-          <div className="flex space-x-4">
-            <div className="relative">
-              <input
-                type="text"
-                placeholder="Search universities..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-64 dark:bg-gray-700 dark:border-gray-600"
-              />
-              <Search className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+        {/* Hero Section */}
+        <div className="bg-gradient-to-r from-[#004e9a] to-[#f37021] text-white py-12">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex flex-col items-center text-center">
+              <Building2 className="w-16 h-16 mb-6" />
+              <h1 className="text-4xl font-bold mb-4">Partner Universities</h1>
+              <p className="text-lg text-white/90 max-w-2xl">
+                Discover prestigious universities worldwide offering high-quality education and excellent career prospects
+              </p>
             </div>
-            
-            <Button onClick={openFilterDrawer} className="lg:hidden">
-              <Filter className="h-5 w-5" />
-            </Button>
           </div>
         </div>
 
-        <div className="grid grid-cols-12 gap-6">
-          {/* Desktop Filters */}
-          <div className="hidden lg:block col-span-3">
-            <UniversityFilters
-              isOpen={false}
-              onClose={() => {}}
-              filters={filters}
-              onFilterChange={updateFilters}
-            />
+        {/* Main Content */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          {/* Search and Filter Bar */}
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 mb-8">
+            <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
+              <div className="relative w-full sm:w-96">
+                <input
+                  type="text"
+                  placeholder="Search universities..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+                <Search className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
+              </div>
+              
+              <Button onClick={openFilterDrawer} className="w-full sm:w-auto lg:hidden">
+                <Filter className="h-5 w-5 mr-2" />
+                Filters
+              </Button>
+            </div>
           </div>
 
-          {/* University Grid */}
-          <div className="col-span-12 lg:col-span-9">
-            <UniversityGrid
-              universities={filteredUniversities}
-              view={view}
-              onViewChange={toggleView}
-              onSelect={handleUniversitySelect}
-            />
+          <div className="grid grid-cols-12 gap-8">
+            {/* Desktop Filters */}
+            <div className="hidden lg:block col-span-3">
+              <div className="sticky top-8">
+                <UniversityFilters
+                  isOpen={false}
+                  onClose={() => {}}
+                  filters={filters}
+                  onFilterChange={updateFilters}
+                />
+              </div>
+            </div>
+
+            {/* University Grid */}
+            <div className="col-span-12 lg:col-span-9">
+              {filteredUniversities.length === 0 ? (
+                <div className="text-center py-12 bg-white dark:bg-gray-800 rounded-lg">
+                  <p className="text-gray-500 dark:text-gray-400 text-lg">
+                    No universities found matching your criteria
+                  </p>
+                </div>
+              ) : (
+                <UniversityGrid
+                  universities={filteredUniversities}
+                  view={view}
+                  onViewChange={toggleView}
+                  onSelect={(id) => navigate(`/universities/${id}`)}
+                />
+              )}
+            </div>
           </div>
         </div>
-
-        {/* Mobile Filters Drawer */}
-        {isFilterDrawerOpen && (
-          <UniversityFilters
-            isOpen={true}
-            onClose={closeFilterDrawer}
-            filters={filters}
-            onFilterChange={updateFilters}
-          />
-        )}
       </div>
+
+      {/* Mobile Filters Drawer */}
+      {isFilterDrawerOpen && (
+        <UniversityFilters
+          isOpen={true}
+          onClose={closeFilterDrawer}
+          filters={filters}
+          onFilterChange={updateFilters}
+        />
+      )}
+
       <Footer />
     </>
   );

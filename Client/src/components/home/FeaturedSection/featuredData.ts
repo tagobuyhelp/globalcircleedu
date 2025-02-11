@@ -29,10 +29,10 @@ export const featuredData: Feature[] = [
   viewAllLink: '/universities',
   items: [
     {
-      title: 'Massachusetts Institute of Technology',
-      location: 'USA',
+      title: 'Lithuanian University of Health Sciences',
+      location: 'Europe',
       ranking: '#1',
-      link: '/universities/676c143ee7208ddfe19c78e3'
+      link: '/universities'
     },
     {
       title: 'Moscow State University',

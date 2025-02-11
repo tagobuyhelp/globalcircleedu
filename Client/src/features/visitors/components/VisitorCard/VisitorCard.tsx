@@ -22,21 +22,21 @@ export const VisitorCard: React.FC<VisitorCardProps> = ({
     <Card className="overflow-hidden">
       <div className="flex items-start p-6">
         <img
-          src={visitor.profilePicture}
-          alt={visitor.name}
+          src={visitor?.profilePicture || '/placeholder.jpg'}
+          alt={visitor?.name || 'Unknown Visitor'}
           className="w-24 h-24 rounded-full object-cover"
         />
         <div className="ml-6 flex-1">
           <div className="flex justify-between">
             <div>
-              <h3 className="text-xl font-semibold">{visitor.name}</h3>
+              <h3 className="text-xl font-semibold">{visitor?.name || 'N/A'}</h3>
               <span className="inline-block px-2 py-1 text-sm rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
-                {visitor.visitorType}
+                {visitor?.visitorType || 'Unknown'}
               </span>
             </div>
             <div className="space-x-2">
               {onEdit && (
-                <Button variant="secondary" onClick={() => onEdit(visitor.id)}>
+                <Button variant="secondary" onClick={() => onEdit(visitor?.id || '')}>
                   Edit
                 </Button>
               )}
@@ -44,7 +44,7 @@ export const VisitorCard: React.FC<VisitorCardProps> = ({
                 <Button 
                   variant="outline" 
                   className="text-red-600 border-red-600 hover:bg-red-50"
-                  onClick={() => onDelete(visitor.id)}
+                  onClick={() => onDelete(visitor?.id || '')}
                 >
                   Delete
                 </Button>
@@ -56,25 +56,29 @@ export const VisitorCard: React.FC<VisitorCardProps> = ({
             <div className="space-y-2">
               <div className="flex items-center text-sm">
                 <Mail className="w-4 h-4 mr-2" />
-                <span>{visitor.email}</span>
+                <span>{visitor?.email || 'N/A'}</span>
               </div>
               <div className="flex items-center text-sm">
                 <Phone className="w-4 h-4 mr-2" />
-                <span>{visitor.phone}</span>
+                <span>{visitor?.phone || 'N/A'}</span>
               </div>
               <div className="flex items-center text-sm">
                 <MapPin className="w-4 h-4 mr-2" />
-                <span>{visitor.address.city}, {visitor.address.state}</span>
+                <span>
+                  {visitor?.address?.city || 'Unknown City'}, {visitor?.address?.state || 'Unknown State'}
+                </span>
               </div>
             </div>
             <div className="space-y-2">
               <div className="flex items-center text-sm">
                 <GraduationCap className="w-4 h-4 mr-2" />
-                <span>{visitor.education.level} in {visitor.education.fieldOfStudy}</span>
+                <span>
+                  {visitor?.education?.level || 'No Education'} in {visitor?.education?.fieldOfStudy || 'N/A'}
+                </span>
               </div>
               <div className="flex items-center text-sm">
                 <Briefcase className="w-4 h-4 mr-2" />
-                <span>{visitor.professional.jobTitle || 'No work experience'}</span>
+                <span>{visitor?.professional?.jobTitle || 'No work experience'}</span>
               </div>
             </div>
           </div>
@@ -83,9 +87,9 @@ export const VisitorCard: React.FC<VisitorCardProps> = ({
 
       <div className="border-t px-6 py-4">
         <div className="grid grid-cols-3 gap-6">
-          <VisitorEducation education={visitor.education} />
-          <VisitorProfessional professional={visitor.professional} />
-          <VisitorDocuments documents={visitor.documents} />
+          <VisitorEducation education={visitor?.education || {}} />
+          <VisitorProfessional professional={visitor?.professional || {}} />
+          <VisitorDocuments documents={visitor?.documents || {}} />
         </div>
       </div>
     </Card>

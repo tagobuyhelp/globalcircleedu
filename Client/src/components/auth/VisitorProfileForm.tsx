@@ -237,9 +237,9 @@ const iconClasses = "absolute left-3 top-3.5 h-4 w-4 text-gray-400";
               className={inputClasses}
             >
               <option value="">Select gender</option>
-              <option value="male">Male</option>
-              <option value="female">Female</option>
-              <option value="other">Other</option>
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+              <option value="Other">Other</option>
             </select>
           </div>
         </div>
@@ -369,7 +369,7 @@ const iconClasses = "absolute left-3 top-3.5 h-4 w-4 text-gray-400";
           {...register('education.score.gpa', { 
             required: 'GPA is required',
             min: { value: 0, message: 'GPA must be positive' },
-            max: { value: 4, message: 'GPA cannot exceed 4.0' }
+            max: { value: 10, message: 'GPA cannot exceed 4.0' }
           })}
           className={inputClasses}
           placeholder="Enter GPA (e.g. 3.5)"
