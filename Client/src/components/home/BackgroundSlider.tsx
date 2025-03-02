@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 
 export const slides = [
   {
@@ -49,7 +49,8 @@ export const BackgroundSlider: React.FC<BackgroundSliderProps> = ({
           style={{
             backgroundImage: `url(${slide.url})`,
             backgroundSize: 'cover',
-            backgroundPosition: 'center'
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat'
           }}
         >
           {/* Multi-layer gradient overlay for better text contrast and visual appeal */}
@@ -60,7 +61,7 @@ export const BackgroundSlider: React.FC<BackgroundSliderProps> = ({
       ))}
       
       {/* Slide Indicators */}
-      <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex space-x-3">
+      <div className="absolute bottom-4 sm:bottom-8 left-1/2 transform -translate-x-1/2 flex space-x-2 sm:space-x-3">
         {slides.map((_, index) => (
           <button
             key={index}

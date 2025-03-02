@@ -41,6 +41,51 @@ export const worldMapData = [
     path: 'M 590 190 L 610 185 L 615 205 L 595 210 Z',
     color: '#60A5FA'
   },
+  // New European Countries
+  {
+    id: 'france',
+    name: 'France',
+    path: 'M 460 140 L 470 135 L 475 145 L 465 150 Z',
+    color: '#3B82F6'
+  },
+  {
+    id: 'germany',
+    name: 'Germany',
+    path: 'M 480 130 L 490 125 L 495 135 L 485 140 Z',
+    color: '#2563EB'
+  },
+  {
+    id: 'italy',
+    name: 'Italy',
+    path: 'M 490 160 L 500 155 L 505 165 L 495 170 Z',
+    color: '#60A5FA'
+  },
+  {
+    id: 'spain',
+    name: 'Spain',
+    path: 'M 440 170 L 450 165 L 455 175 L 445 180 Z',
+    color: '#1D4ED8'
+  },
+  // Central Asian Countries
+  {
+    id: 'uzbekistan',
+    name: 'Uzbekistan',
+    path: 'M 620 160 L 630 155 L 635 165 L 625 170 Z',
+    color: '#3B82F6'
+  },
+  // South Asian Countries
+  {
+    id: 'nepal',
+    name: 'Nepal',
+    path: 'M 670 200 L 680 195 L 685 205 L 675 210 Z',
+    color: '#2563EB'
+  },
+  {
+    id: 'bangladesh',
+    name: 'Bangladesh',
+    path: 'M 690 210 L 700 205 L 705 215 L 695 220 Z',
+    color: '#60A5FA'
+  },
   // Background continents with lower opacity
   {
     id: 'europe',

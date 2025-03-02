@@ -1,9 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../../store/authStore';
 import { 
-  Menu, Home, BookOpen, 
-  Building2, Briefcase, Newspaper, Settings,
+  Menu, Home, Briefcase, Newspaper, Settings,
   Globe
 } from 'lucide-react';
 import { Button } from '../ui/Button';
@@ -18,24 +17,46 @@ export const Navbar = () => {
 
   const navItems = [
     { label: 'Home', path: '/', icon: Home },
-    { label: 'Courses', path: '/courses', icon: BookOpen },
-    { label: 'Universities', path: '/universities', icon: Building2 },
     { 
       label: 'Study Destinations', 
       path: '#',
       icon: Globe,
       children: [
+        // Western Europe
         { label: 'France', path: '/study/france' },
         { label: 'Spain', path: '/study/spain' },
         { label: 'Portugal', path: '/study/portugal' },
         { label: 'Ireland', path: '/study/ireland' },
-        { label: 'Poland', path: '/study/poland' },
         { label: 'Italy', path: '/study/italy' },
-        { label: 'Czech Republic', path: '/study/czech-republic' },
+        { label: 'Norway', path: '/study/norway' },
+        
+        // Central Europe
+        { label: 'Czech Republic', path: '/study/czech' },
+        { label: 'Poland', path: '/study/poland' },
         { label: 'Slovenia', path: '/study/slovenia' },
+        { label: 'Slovakia', path: '/study/slovakia' },
+        { label: 'Bosnia and Herzegovina', path: '/study/bosnia' },
+        
+        // Northern Europe
         { label: 'Sweden', path: '/study/sweden' },
         { label: 'Denmark', path: '/study/denmark' },
-        { label: 'Cyprus', path: '/study/cyprus' }
+        { label: 'Latvia', path: '/study/latvia' },
+        { label: 'Lithuania', path: '/study/lithuania' },
+        { label: 'Estonia', path: '/study/estonia' },
+        
+        // Southern Europe
+        { label: 'Greece', path: '/study/greece' },
+        { label: 'Croatia', path: '/study/croatia' },
+        { label: 'Malta', path: '/study/malta' },
+        { label: 'Cyprus', path: '/study/cyprus' },
+        
+        // Eastern Europe
+        { label: 'Belarus', path: '/study/belarus' },
+        { label: 'Georgia', path: '/study/georgia' },
+        
+        // Other Regions
+        { label: 'Australia', path: '/study/australia' },
+        { label: 'United Arab Emirates', path: '/study/united%20arab%20emirates' }
       ]
     },
     { label: 'Jobs', path: '/jobs', icon: Briefcase },
@@ -47,9 +68,9 @@ export const Navbar = () => {
 
   return (
     <nav className="sticky top-0 z-50 bg-white shadow-sm dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
-      <div className="max-w-[1300px] mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
-          <div className="flex items-center justify-start max-w-[200px] ">
+          <div className="flex items-center">
             <Logo />
           </div>
 
@@ -72,8 +93,8 @@ export const Navbar = () => {
                       <span>{item.label}</span>
                     </button>
                     {isCountriesMenuOpen && (
-                      <div className="absolute left-0 mt-2 w-56 rounded-md shadow-lg bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5">
-                        <div className="py-1" role="menu">
+                      <div className="absolute left-0 mt-2 w-64 rounded-md shadow-lg bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5">
+                        <div className="py-1 max-h-[70vh] overflow-y-auto" role="menu">
                           {item.children.map((child) => (
                             <Link
                               key={child.path}
@@ -128,14 +149,14 @@ export const Navbar = () => {
             )}
           </div>
 
-          {/* Mobile menu button */}
+          {/* Mobile menu button - Updated with background color */}
           <div className="md:hidden flex items-center">
             <button
               onClick={() => setIsMobileMenuOpen(true)}
-              className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+              className="p-2 rounded-lg bg-[#004e9a]/10 hover:bg-[#004e9a]/20 transition-colors"
               aria-label="Open menu"
             >
-              <Menu className="h-6 w-6" />
+              <Menu className="h-6 w-6 text-[#004e9a]" />
             </button>
           </div>
         </div>

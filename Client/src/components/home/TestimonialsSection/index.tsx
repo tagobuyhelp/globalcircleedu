@@ -103,8 +103,19 @@ export const TestimonialsSection = () => {
   };
 
   return (
-    <section className="py-16 bg-gray-50 dark:bg-gray-900">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section className="py-16 relative overflow-hidden">
+      {/* Background with parallax effect */}
+      <div 
+        className="absolute inset-0 bg-cover bg-center bg-fixed"
+        style={{ 
+          backgroundImage: 'url(https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&q=80&w=2000)',
+          transform: 'translateZ(0)'
+        }}
+      >
+        <div className="absolute inset-0 bg-gradient-to-br from-gray-900/95 via-gray-900/90 to-gray-900/95 backdrop-blur-sm" />
+      </div>
+
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
           <div className="relative h-32">
             {testimonialSlides.map((slide, index) => (
@@ -116,13 +127,13 @@ export const TestimonialsSection = () => {
                     : 'opacity-0 translate-y-4'
                 }`}
               >
-                <h2 className="text-3xl font-bold mb-4">
+                <h2 className="text-3xl font-bold mb-4 text-white">
                   {slide.title}
                   <span className="block text-[#f37021] text-2xl mt-2">
                     {slide.subtitle}
                   </span>
                 </h2>
-                <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+                <p className="text-lg text-gray-300 max-w-2xl mx-auto">
                   {slide.description}
                 </p>
               </div>
@@ -141,7 +152,7 @@ export const TestimonialsSection = () => {
                 className={`w-2 h-2 rounded-full transition-all duration-300 ${
                   index === currentSlide 
                     ? 'w-8 bg-[#f37021]' 
-                    : 'bg-gray-300 dark:bg-gray-600'
+                    : 'bg-white/50'
                 }`}
                 aria-label={`Go to slide ${index + 1}`}
               />
@@ -172,15 +183,15 @@ export const TestimonialsSection = () => {
           {/* Navigation Buttons */}
           <button
             onClick={handlePrevious}
-            className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 w-12 h-12 bg-white dark:bg-gray-800 rounded-full shadow-lg flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+            className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 w-12 h-12 bg-white/10 dark:bg-gray-800/10 backdrop-blur-sm rounded-full shadow-lg flex items-center justify-center hover:bg-white/20 dark:hover:bg-gray-800/20 transition-colors"
           >
-            <ChevronLeft className="w-6 h-6" />
+            <ChevronLeft className="w-6 h-6 text-white" />
           </button>
           <button
             onClick={handleNext}
-            className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 w-12 h-12 bg-white dark:bg-gray-800 rounded-full shadow-lg flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+            className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 w-12 h-12 bg-white/10 dark:bg-gray-800/10 backdrop-blur-sm rounded-full shadow-lg flex items-center justify-center hover:bg-white/20 dark:hover:bg-gray-800/20 transition-colors"
           >
-            <ChevronRight className="w-6 h-6" />
+            <ChevronRight className="w-6 h-6 text-white" />
           </button>
 
           {/* Dots Navigation */}
@@ -195,7 +206,7 @@ export const TestimonialsSection = () => {
                 className={`h-2 rounded-full transition-all duration-300 ${
                   index === activeIndex 
                     ? 'w-8 bg-[#f37021]' 
-                    : 'w-2 bg-gray-300 dark:bg-gray-600 hover:bg-gray-400 dark:hover:bg-gray-500'
+                    : 'w-2 bg-white/30 hover:bg-white/50'
                 }`}
                 aria-label={`Go to testimonial ${index + 1}`}
               />

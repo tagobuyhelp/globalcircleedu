@@ -5,6 +5,7 @@ import { useThemeStore } from './store/themeStore';
 import { AuthProvider } from './providers/AuthProvider';
 import { ChatProvider } from './components/chat/ChatProvider';
 import { Toaster } from 'react-hot-toast';
+import { JourneyPopup } from './components/home/JourneyPopup';
 
 function App() {
   const { isDarkMode } = useThemeStore();
@@ -17,6 +18,7 @@ function App() {
             <div className={isDarkMode ? 'dark' : ''}>
               <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
                 <AppRoutes />
+                <JourneyPopup />
               </div>
             </div>
           </ChatProvider>

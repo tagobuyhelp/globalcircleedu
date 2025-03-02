@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { 
@@ -13,24 +13,53 @@ import { Card } from '../../components/ui/Card';
 import { Footer } from '../../components/layout/Footer';
 import { countries } from '../../data/studyDestinations';
 import type { Country } from '../../data/countries/types';
+import { JourneyPopup } from '../../components/home/JourneyPopup';
 
 export const CountryDetailsPage = () => {
   const { countryName } = useParams<{ countryName: string }>();
   const [country, setCountry] = useState<Country | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState('overview');
+  const [showJourneyPopup, setShowJourneyPopup] = useState(false);
 
   useEffect(() => {
-    const selectedCountry = countries.find(
-      c => c.name.toLowerCase() === countryName?.toLowerCase()
-    );
-    setCountry(selectedCountry || null);
+    try {
+      setLoading(true);
+      // Decode the URL parameter to handle spaces and special characters
+      const decodedCountryName = decodeURIComponent(countryName || '');
+      
+      // Case-insensitive search for the country
+      const selectedCountry = countries.find(
+        c => c.name.toLowerCase() === decodedCountryName.toLowerCase()
+      );
+      
+      if (selectedCountry) {
+        setCountry(selectedCountry);
+      } else {
+        setError('Country not found');
+      }
+    } catch (err) {
+      console.error('Error loading country:', err);
+      setError('Failed to load country details');
+    } finally {
+      setLoading(false);
+    }
   }, [countryName]);
 
-  if (!country) {
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
+
+  if (error || !country) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <p className="text-xl text-gray-600 mb-4">Country not found</p>
+          <p className="text-xl text-gray-600 mb-4">{error || 'Country not found'}</p>
           <Link to="/" className="text-blue-600 hover:text-blue-700">
             Return to Home
           </Link>
@@ -39,15 +68,19 @@ export const CountryDetailsPage = () => {
     );
   }
 
+  const handleApplyNow = () => {
+    setShowJourneyPopup(true);
+  };
+
   return (
     <>
       <Helmet>
-        <title>Study in {country.name} | Global Circle Edu</title>
+        <title>{`Study in ${country.name} | Global Circle Edu`}</title>
         <meta name="description" content={country.description} />
       </Helmet>
 
       {/* Hero Section with Parallax Effect */}
-      <div className="relative h-[70vh] overflow-hidden">
+      <div className="relative h-screen overflow-hidden">
         <div 
           className="absolute inset-0 bg-center bg-cover transform scale-110"
           style={{ 
@@ -59,29 +92,29 @@ export const CountryDetailsPage = () => {
         />
         <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/70">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full flex flex-col justify-center">
-            <Link to="/" className="text-white/90 hover:text-white flex items-center mb-6 group">
+            <Link to="/" className="text-white/90 hover:text-white flex items-center mb-4 sm:mb-6 group">
               <ChevronLeft className="w-5 h-5 mr-1 transform group-hover:-translate-x-1 transition-transform" />
               Back to Home
             </Link>
-            <h1 className="text-5xl md:text-6xl font-bold text-white mb-6 animate-fade-in">
+            <h1 className="text-3xl sm:text-5xl md:text-6xl font-bold text-white mb-4 sm:mb-6 animate-fade-in">
               Study in {country.name}
             </h1>
-            <p className="text-xl text-white/90 max-w-2xl animate-fade-in">
+            <p className="text-lg sm:text-xl text-white/90 max-w-2xl animate-fade-in">
               {country.description}
             </p>
 
             {/* Quick Stats */}
-            <div className="grid grid-cols-3 gap-6 mt-12">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-6 mt-8 sm:mt-12">
               {Object.entries(country.stats).map(([key, value]) => (
-                <div key={key} className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/20">
+                <div key={key} className="bg-white/10 backdrop-blur-sm rounded-lg p-3 sm:p-4 border border-white/20">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-white/70 text-sm capitalize">{key}</p>
-                      <p className="text-2xl font-bold text-white">{value}</p>
+                      <p className="text-white/70 text-xs sm:text-sm capitalize">{key}</p>
+                      <p className="text-lg sm:text-2xl font-bold text-white">{value}</p>
                     </div>
-                    {key === 'universities' && <Building2 className="w-8 h-8 text-white/50" />}
-                    {key === 'students' && <Users className="w-8 h-8 text-white/50" />}
-                    {key === 'programs' && <BookOpen className="w-8 h-8 text-white/50" />}
+                    {key === 'universities' && <Building2 className="w-6 h-6 sm:w-8 sm:h-8 text-white/50" />}
+                    {key === 'students' && <Users className="w-6 h-6 sm:w-8 sm:h-8 text-white/50" />}
+                    {key === 'programs' && <BookOpen className="w-6 h-6 sm:w-8 sm:h-8 text-white/50" />}
                   </div>
                 </div>
               ))}
@@ -93,12 +126,12 @@ export const CountryDetailsPage = () => {
       {/* Navigation Tabs */}
       <div className="sticky top-0 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 z-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex space-x-8 overflow-x-auto">
+          <div className="flex overflow-x-auto scrollbar-hide -mx-4 px-4">
             {['overview', 'universities', 'admission', 'visa', 'costs'].map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
-                className={`py-4 px-2 border-b-2 font-medium text-sm whitespace-nowrap transition-colors ${
+                className={`py-4 px-4 sm:px-6 border-b-2 font-medium text-sm whitespace-nowrap transition-colors ${
                   activeTab === tab
                     ? 'border-[#004e9a] text-[#004e9a]'
                     : 'border-transparent text-gray-500 hover:text-gray-700'
@@ -111,15 +144,15 @@ export const CountryDetailsPage = () => {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
           {/* Main Content */}
-          <div className="lg:col-span-2 space-y-8">
+          <div className="lg:col-span-2 space-y-6 sm:space-y-8">
             {activeTab === 'overview' && (
               <>
                 {/* Academic Institutions */}
-                <Card className="p-6 overflow-hidden">
-                  <h2 className="text-2xl font-bold mb-6">Academic Institutions</h2>
+                <Card className="p-4 sm:p-6 overflow-hidden">
+                  <h2 className="text-xl sm:text-2xl font-bold mb-6">Academic Institutions</h2>
                   <div className="space-y-6">
                     {Object.entries(country.academicInstitutions).map(([key, value]) => (
                       <div key={key} className="relative">
@@ -153,9 +186,9 @@ export const CountryDetailsPage = () => {
                 </Card>
 
                 {/* Features */}
-                <Card className="p-6">
-                  <h2 className="text-2xl font-bold mb-6">Key Features</h2>
-                  <div className="grid grid-cols-2 gap-4">
+                <Card className="p-4 sm:p-6">
+                  <h2 className="text-xl sm:text-2xl font-bold mb-6">Key Features</h2>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     {country.features.map((feature, index) => (
                       <div 
                         key={index}
@@ -328,14 +361,14 @@ export const CountryDetailsPage = () => {
           {/* Sidebar */}
           <div className="space-y-6">
             {/* Quick Actions */}
-            <Card className="p-6 bg-gradient-to-br from-[#004e9a] to-[#f37021] text-white">
-              <h2 className="text-xl font-bold mb-4">Start Your Journey</h2>
+            <Card className="p-4 sm:p-6 bg-gradient-to-br from-[#004e9a] to-[#f37021] text-white">
+              <h2 className="text-lg sm:text-xl font-bold mb-4">Start Your Journey</h2>
               <p className="mb-6 text-white/90">
                 Ready to begin your educational journey in {country.name}? Let us guide you through the process.
               </p>
               <Button 
                 className="w-full bg-white text-[#004e9a] hover:bg-gray-100 group"
-                onClick={() => window.location.href = '/register'}
+                onClick={handleApplyNow}
               >
                 Apply Now
                 <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
@@ -343,7 +376,7 @@ export const CountryDetailsPage = () => {
             </Card>
 
             {/* Key Information */}
-            <Card className="p-6">
+            <Card className="p-4 sm:p-6">
               <h3 className="font-semibold mb-4">Key Information</h3>
               <div className="space-y-4">
                 <div className="flex items-center">
@@ -364,6 +397,11 @@ export const CountryDetailsPage = () => {
         </div>
       </div>
       <Footer />
+      
+      {/* Journey Popup */}
+      {showJourneyPopup && (
+        <JourneyPopup onClose={() => setShowJourneyPopup(false)} />
+      )}
     </>
   );
 };

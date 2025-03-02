@@ -20,10 +20,10 @@ export const SocialLinks = () => {
             href={social.href}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-white hover:text-[#f37021] transition-colors"
+            className="w-10 h-10 rounded-full bg-gray-800 hover:bg-[#f37021] flex items-center justify-center transition-all duration-300 group"
             aria-label={social.label}
           >
-            <Icon className="h-5 w-5" />
+            <Icon className="h-5 w-5 text-gray-300 group-hover:text-white transition-colors" />
           </a>
         );
       })}

@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, GraduationCap, Building2, Briefcase, Newspaper } from 'lucide-react';
+import { GraduationCap, Building2, Briefcase, Newspaper } from 'lucide-react';
 import { Card } from '../../ui/Card';
-import { Button } from '../../ui/Button';
-import { Carousel } from '../../ui/Carousel';
 import { featuredData } from './featuredData';
 
 const slides = [
@@ -85,31 +83,6 @@ export const FeaturedSection = () => {
           </div>
         </div>
 
-        {/* CTA Buttons */}
-        <div className="flex flex-col sm:flex-row justify-center gap-4 mb-12">
-          <Link to="/courses">
-            <Button 
-              size="lg" 
-              className="w-full sm:w-auto group bg-gradient-to-r from-[#004e9a] to-[#f37021] hover:from-[#003d7a] hover:to-[#d85a0f] transform hover:scale-105 transition-all duration-300"
-            >
-              <GraduationCap className="w-5 h-5 mr-2" />
-              Browse Courses
-              <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
-            </Button>
-          </Link>
-          <Link to="/universities">
-            <Button 
-              size="lg" 
-              variant="outline"
-              className="w-full sm:w-auto group border-2 border-[#004e9a] text-[#004e9a] hover:bg-[#004e9a]/5 dark:border-[#60a5fa] dark:text-[#60a5fa] dark:hover:bg-[#60a5fa]/5 transform hover:scale-105 transition-all duration-300"
-            >
-              <Building2 className="w-5 h-5 mr-2" />
-              Explore Universities
-              <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
-            </Button>
-          </Link>
-        </div>
-
         {/* Feature Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {featuredData.map((feature, index) => (
@@ -152,7 +125,6 @@ export const FeaturedSection = () => {
                           {item.ranking && ` • ${item.ranking}`}
                         </div>
                       </div>
-                      <ArrowRight className="w-4 h-4 text-gray-400 group-hover:text-[#004e9a] dark:group-hover:text-[#60a5fa] transition-colors opacity-0 group-hover:opacity-100 transform translate-x-2 group-hover:translate-x-0" />
                     </div>
                   </Link>
                 ))}

@@ -4,11 +4,11 @@ import { HomeLayout } from '../components/layout/HomeLayout';
 import { HeroSection } from '../components/home/HeroSection';
 import { FeaturedSection } from '../components/home/FeaturedSection';
 import { ServicesSection } from '../components/home/ServicesSection';
-import { TeamSection } from '../components/home/TeamSection';
-import { JourneySection } from '../components/home/JourneySection';
 import { TestimonialsSection } from '../components/home/TestimonialsSection';
 import { GlobalPresenceSection } from '../components/home/GlobalPresenceSection';
 import { StudyDestinationsSection } from '../components/home/StudyDestinationsSection';
+import { CreditTransferSection } from '../components/home/CreditTransferSection';
+import { DegreePrograms } from '../components/home/DegreePrograms';
 
 export const Home = () => {
   return (
@@ -20,11 +20,11 @@ export const Home = () => {
 
       <main>
         <HeroSection />
+        <DegreePrograms />
         <FeaturedSection />
         <ServicesSection />
+        <CreditTransferSection />
         <StudyDestinationsSection />
-        <TeamSection />
-        <JourneySection />
         <TestimonialsSection />
         <GlobalPresenceSection />
       </main>

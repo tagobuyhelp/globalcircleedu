@@ -84,8 +84,19 @@ export const ServicesSection = () => {
   }, []);
 
   return (
-    <section className="py-20 bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section className="py-20 relative overflow-hidden">
+      {/* Background with parallax effect */}
+      <div 
+        className="absolute inset-0 bg-cover bg-center bg-fixed"
+        style={{ 
+          backgroundImage: 'url(https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&q=80&w=2000)',
+          transform: 'translateZ(0)'
+        }}
+      >
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-900/90 via-blue-900/80 to-indigo-900/90 backdrop-blur-sm" />
+      </div>
+
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
           <div className="relative h-32">
             {serviceSlides.map((slide, index) => (
@@ -97,13 +108,13 @@ export const ServicesSection = () => {
                     : 'opacity-0 translate-y-4'
                 }`}
               >
-                <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
+                <h2 className="text-3xl font-bold text-white mb-4">
                   {slide.title}
                   <span className="block text-[#f37021] text-2xl mt-2">
                     {slide.subtitle}
                   </span>
                 </h2>
-                <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+                <p className="text-lg text-gray-200 max-w-2xl mx-auto">
                   {slide.description}
                 </p>
               </div>
@@ -119,7 +130,7 @@ export const ServicesSection = () => {
                 className={`h-2 rounded-full transition-all duration-300 ${
                   index === currentSlide 
                     ? 'w-8 bg-[#f37021]' 
-                    : 'w-2 bg-gray-300 dark:bg-gray-600 hover:bg-gray-400 dark:hover:bg-gray-500'
+                    : 'w-2 bg-white/30 hover:bg-white/50'
                 }`}
                 aria-label={`Go to slide ${index + 1}`}
               />
@@ -133,35 +144,20 @@ export const ServicesSection = () => {
             return (
               <div 
                 key={index}
-                className="group relative bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-200 dark:border-gray-700"
+                className="group relative bg-white/5 backdrop-blur-sm p-6 rounded-xl overflow-hidden border border-white/10 hover:bg-white/10 transition-all duration-300"
               >
-                <div className={`inline-flex p-3 rounded-lg bg-${service.color}-50 dark:bg-${service.color}-900/20 text-${service.color}-600 dark:text-${service.color}-400 mb-4 group-hover:scale-110 transition-transform duration-300`}>
-                  <Icon className="h-6 w-6" />
+                <div className={`inline-flex p-3 rounded-lg bg-${service.color}-50/10 text-${service.color}-400 mb-4 group-hover:scale-110 transition-transform duration-300`}>
+                  <Icon className="w-6 h-6" />
                 </div>
-                <h3 className="text-xl font-semibold mb-2 group-hover:text-[#004e9a] transition-colors">
+                <h3 className="text-xl font-semibold mb-2 text-white group-hover:text-[#f37021] transition-colors">
                   {service.title}
                 </h3>
-                <p className="text-gray-600 dark:text-gray-400 mb-4">
+                <p className="text-gray-300">
                   {service.description}
                 </p>
-                <Link 
-                  to={service.link}
-                  className="inline-flex items-center text-[#004e9a] hover:text-[#003d7a] font-medium"
-                >
-                  Learn more
-                  <ArrowRight className="ml-2 w-4 h-4 transform group-hover:translate-x-1 transition-transform" />
-                </Link>
               </div>
             );
           })}
-        </div>
-
-        <div className="text-center mt-12">
-          <Link to="/services">
-            <Button size="lg" className="bg-[#004e9a] hover:bg-[#003d7a] text-white">
-              View All Services
-            </Button>
-          </Link>
         </div>
       </div>
     </section>
