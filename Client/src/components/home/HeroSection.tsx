@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { 
   ArrowRight, FileCheck, Clock, DollarSign, 
   Mail, Phone, User, MapPin, BookOpen,
-  Building2, Globe2, Users
+  Building2, Globe2, Users, GraduationCap 
 } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { Card } from '../ui/Card';
@@ -17,7 +17,7 @@ import toast from 'react-hot-toast';
 export const HeroSection = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [currentSlide, setCurrentSlide] = useState(0);
-  const [selectedType, setSelectedType] = useState<'Student' | 'Worker'>('Student'); // Set default to 'Student'
+  const [selectedType, setSelectedType] = useState<'Student' | 'Worker'>('Student');
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
@@ -47,22 +47,62 @@ export const HeroSection = () => {
     }
   ];
 
-  const handleNext = () => {
-    if (currentStep === 1) {
-      if (!formData.name) {
-        toast.error('Please enter your name');
-        return;
-      }
-      if (!formData.email) {
-        toast.error('Please enter your email');
-        return;
-      }
-      if (!formData.phone) {
-        toast.error('Please enter your phone number');
-        return;
-      }
+  const validateStep1 = () => {
+    if (!formData.name.trim()) {
+      toast.error('Please enter your name');
+      return false;
     }
-    setCurrentStep(prev => prev + 1);
+    if (!formData.email.trim()) {
+      toast.error('Please enter your email');
+      return false;
+    }
+    if (!formData.phone.trim()) {
+      toast.error('Please enter your phone number');
+      return false;
+    }
+    return true;
+  };
+
+  const validateStep2 = () => {
+    if (!selectedType) {
+      toast.error('Please select your path');
+      return false;
+    }
+    return true;
+  };
+
+  const validateStep3 = () => {
+    if (!formData.country) {
+      toast.error('Please select your preferred country');
+      return false;
+    }
+    if (!formData.program) {
+      toast.error('Please enter your interested program');
+      return false;
+    }
+    return true;
+  };
+
+  const handleNext = () => {
+    let isValid = false;
+    
+    switch (currentStep) {
+      case 1:
+        isValid = validateStep1();
+        break;
+      case 2:
+        isValid = validateStep2();
+        break;
+      case 3:
+        isValid = validateStep3();
+        break;
+      default:
+        isValid = true;
+    }
+
+    if (isValid) {
+      setCurrentStep(prev => prev + 1);
+    }
   };
 
   const handleBack = () => {
@@ -71,7 +111,73 @@ export const HeroSection = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setShowJourneyPopup(true);
+    
+    try {
+      // Create email content
+      const emailSubject = `New Journey Inquiry for ${selectedType}`;
+      const emailBody = `
+New Journey Inquiry Details:
+
+Personal Information:
+-------------------
+Name: ${formData.name}
+Email: ${formData.email}
+Phone: ${formData.countryCode}${formData.phone}
+
+Interest Details:
+---------------
+Type: ${selectedType}
+Country: ${formData.country}
+Program: ${formData.program}
+      `.trim();
+
+      // Create mailto link with pre-filled data
+      const mailtoLink = `mailto:info@globalcircleedu.com?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody)}`;
+
+      // Open email client
+      window.location.href = mailtoLink;
+
+      // Send confirmation email to inquirer
+      const confirmationSubject = 'Thank you for your interest - Global Circle Edu';
+      const confirmationBody = `
+Dear ${formData.name},
+
+Thank you for your interest in ${selectedType === 'Student' ? 'studying' : 'working'} abroad with Global Circle Edu. We have received your inquiry and our team will review it shortly.
+
+We will contact you within 24-48 hours to discuss your interests and guide you through the next steps.
+
+Your Inquiry Details:
+- Type: ${selectedType}
+- Country: ${formData.country}
+- Program: ${formData.program}
+
+Best regards,
+Global Circle Edu Team
+      `.trim();
+
+      // Open confirmation email in new tab
+      setTimeout(() => {
+        window.open(`mailto:${formData.email}?subject=${encodeURIComponent(confirmationSubject)}&body=${encodeURIComponent(confirmationBody)}`, '_blank');
+      }, 1000);
+
+      toast.success('Your inquiry has been submitted successfully!');
+      setShowJourneyPopup(false);
+      
+      // Reset form
+      setFormData({
+        name: '',
+        email: '',
+        phone: '',
+        countryCode: '+971',
+        country: '',
+        program: ''
+      });
+      setCurrentStep(1);
+      setSelectedType('Student');
+    } catch (error) {
+      console.error('Error sending inquiry:', error);
+      toast.error('Failed to submit inquiry. Please try again.');
+    }
   };
 
   return (
