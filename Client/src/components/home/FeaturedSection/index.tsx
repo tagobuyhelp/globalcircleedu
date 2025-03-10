@@ -88,22 +88,15 @@ export const FeaturedSection = () => {
           {featuredData.map((feature, index) => (
             <Card 
               key={index}
-              className="p-6 hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 border-t-4"
-              style={{ borderTopColor: `var(--${feature.color}-500)` }}
+              className="bg-white dark:bg-gray-800 p-6 hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1"
             >
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center">
-                  <div className={`p-3 rounded-xl bg-${feature.color}-50 dark:bg-${feature.color}-900/20 text-${feature.color}-600 dark:text-${feature.color}-400`}>
-                    <feature.icon className="w-6 h-6" />
+                  <div className={`w-12 h-12 rounded-full bg-${feature.color}-100 dark:bg-${feature.color}-900/20 flex items-center justify-center`}>
+                    <feature.icon className={`w-6 h-6 text-${feature.color}-600 dark:text-${feature.color}-400`} />
                   </div>
                   <h3 className="text-lg font-semibold ml-3">{feature.title}</h3>
                 </div>
-                <Link 
-                  to={feature.viewAllLink}
-                  className={`text-${feature.color}-600 hover:text-${feature.color}-700 text-sm font-medium`}
-                >
-                  View All
-                </Link>
               </div>
 
               <div className="space-y-4">
@@ -111,7 +104,7 @@ export const FeaturedSection = () => {
                   <Link 
                     key={idx}
                     to={item.link}
-                    className="block p-4 rounded-lg bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors group"
+                    className="block p-4 rounded-lg bg-gray-50 dark:bg-gray-700/50 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors group"
                   >
                     <div className="flex justify-between items-center">
                       <div>

@@ -3,7 +3,7 @@ import type { Country } from './types';
 export const denmark: Country = {
   name: 'Denmark',
   description: 'Experience world-class education in one of the countries with the highest living standards, offering innovative teaching methods and strong focus on research.',
-  image: 'https://images.unsplash.com/photo-1513622470522-26c3c8a854bc?auto=format&fit=crop&q=80&w=2000',
+  image: 'https://res.cloudinary.com/dttifrbaa/image/upload/v1741618254/GCE/sh0zierpbe2bs9qee2bk.webp',
   stats: {
     universities: '45+',
     students: '25,000+',

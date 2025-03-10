@@ -3,7 +3,7 @@ import type { Country } from './types';
 export const latvia: Country = {
   name: 'Latvia',
   description: 'Experience high-quality European education in a country known for its rich cultural heritage, innovative tech sector, and affordable living costs, offering excellent programs in medicine, engineering, and business.',
-  image: 'https://images.unsplash.com/photo-1513622470522-26c3c8a854bc?auto=format&fit=crop&q=80&w=2000',
+  image: 'https://res.cloudinary.com/dttifrbaa/image/upload/v1741618131/GCE/peusryqf46vsfkxvjqye.jpg',
   stats: {
     universities: '35+',
     students: '12,000+',

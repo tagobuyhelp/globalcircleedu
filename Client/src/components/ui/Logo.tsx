@@ -11,7 +11,7 @@ export const Logo: React.FC<LogoProps> = ({ className }) => {
       <img 
         src="/logo.png" 
         alt="Global Circle Edu" 
-        className="h-12 w-auto"
+        className="h-12 w-[190px]"
       />
     </Link>
   );

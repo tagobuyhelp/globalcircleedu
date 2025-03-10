@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { Search, Filter, GraduationCap, Briefcase, Globe2, DollarSign } from 'lucide-react';
+import { Search, Filter, GraduationCap, Briefcase, Globe2, DollarSign, Plane, Home, Car, Building2, FileText, CreditCard, Phone, HelpCircle } from 'lucide-react';
 import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 import { Footer } from '../../components/layout/Footer';
@@ -38,12 +38,56 @@ export const ServicesPage = () => {
         return GraduationCap;
       case 'Job Placement':
         return Briefcase;
+      case 'Post-Departure':
+        return Plane;
+      case 'Post-Arrival':
+        return Home;
       case 'All':
         return Globe2;
       default:
         return DollarSign;
     }
   };
+
+  // Add post-departure and arrival services
+  const postServices = [
+    {
+      title: "Airport Pickup",
+      description: "Reliable transportation service from the airport to your accommodation",
+      icon: Car,
+      type: "Post-Arrival"
+    },
+    {
+      title: "Accommodation Assistance",
+      description: "Help finding and securing suitable student housing or temporary accommodation",
+      icon: Building2,
+      type: "Post-Arrival"
+    },
+    {
+      title: "Documentation Support",
+      description: "Assistance with local registration and necessary paperwork",
+      icon: FileText,
+      type: "Post-Arrival"
+    },
+    {
+      title: "Bank Account Setup",
+      description: "Help opening a local bank account and managing finances",
+      icon: CreditCard,
+      type: "Post-Arrival"
+    },
+    {
+      title: "Local SIM Card",
+      description: "Assistance getting a local phone number and mobile plan",
+      icon: Phone,
+      type: "Post-Arrival"
+    },
+    {
+      title: "Orientation Services",
+      description: "Comprehensive orientation to help you settle into your new environment",
+      icon: HelpCircle,
+      type: "Post-Arrival"
+    }
+  ];
 
   const filteredServices = services.filter(service => {
     const matchesSearch = service.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -87,7 +131,7 @@ export const ServicesPage = () => {
           </div>
           
           <div className="flex space-x-2">
-            {['All', 'Study Abroad', 'Job Placement', 'Other'].map((type) => (
+            {['All', 'Study Abroad', 'Job Placement', 'Post-Departure', 'Post-Arrival', 'Other'].map((type) => (
               <Button
                 key={type}
                 variant={selectedType === type ? 'primary' : 'outline'}
@@ -100,7 +144,7 @@ export const ServicesPage = () => {
           </div>
         </div>
 
-        {/* Services Grid */}
+        {/* Main Services */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredServices.map((service) => {
             const Icon = getServiceIcon(service.type);
@@ -136,10 +180,40 @@ export const ServicesPage = () => {
                     </div>
                   ))}
                 </div>
-
               </Card>
             );
           })}
+        </div>
+
+        {/* Post-Departure & Arrival Services */}
+        <div className="mt-16">
+          <h2 className="text-2xl font-bold mb-8 text-center">Post-Departure & Arrival Services</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {postServices.map((service, index) => {
+              const Icon = service.icon;
+              return (
+                <Card key={index} className="p-6 hover:shadow-lg transition-all duration-300">
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="p-3 rounded-lg bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400">
+                      <Icon className="h-6 w-6" />
+                    </div>
+                    <span className={`px-3 py-1 text-sm rounded-full ${
+                      service.type === 'Post-Departure' 
+                        ? 'bg-[#004e9a]/10 text-[#004e9a]' 
+                        : 'bg-[#f37021]/10 text-[#f37021]'
+                    }`}>
+                      {service.type}
+                    </span>
+                  </div>
+
+                  <h3 className="text-xl font-semibold mb-2">{service.title}</h3>
+                  <p className="text-gray-600 dark:text-gray-400">
+                    {service.description}
+                  </p>
+                </Card>
+              );
+            })}
+          </div>
         </div>
 
         {filteredServices.length === 0 && (

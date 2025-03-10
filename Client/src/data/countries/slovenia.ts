@@ -3,7 +3,7 @@ import type { Country } from './types';
 export const slovenia: Country = {
   name: 'Slovenia',
   description: 'Experience high-quality education in a country that perfectly blends Central European charm with Mediterranean lifestyle, offering affordable education and excellent quality of life.',
-  image: 'https://images.unsplash.com/photo-1509358271058-acd22cc93898?auto=format&fit=crop&q=80&w=2000',
+  image: 'https://res.cloudinary.com/dttifrbaa/image/upload/v1741617890/GCE/suxuvf0ccy0vicqkfqkw.webp',
   stats: {
     universities: '40+',
     students: '12,000+',

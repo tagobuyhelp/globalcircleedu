@@ -1,14 +1,18 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { 
-  GraduationCap, Globe2, Users, Building2, ArrowRight, 
-  ChevronLeft, ChevronRight, Mail, Phone, MapPin, BookOpen
+  ArrowRight, FileCheck, Clock, DollarSign, 
+  Mail, Phone, User, MapPin, BookOpen,
+  Building2, Globe2, Users
 } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { Card } from '../ui/Card';
-import { BackgroundSlider, slides } from './BackgroundSlider';
 import { CountryCodeSelect } from '../ui/CountryCodeSelect';
-import toast from 'react-hot-toast';
+import { useAuthStore } from '../../store/authStore';
+import { BackgroundSlider, slides } from './BackgroundSlider';
+import { JourneyPopup } from './JourneyPopup';
 import { countries } from '../../data/studyDestinations';
+import toast from 'react-hot-toast';
 
 export const HeroSection = () => {
   const [currentStep, setCurrentStep] = useState(1);
@@ -23,6 +27,7 @@ export const HeroSection = () => {
     country: '',
     program: ''
   });
+  const [showJourneyPopup, setShowJourneyPopup] = useState(false);
 
   const stats = [
     {
@@ -43,6 +48,20 @@ export const HeroSection = () => {
   ];
 
   const handleNext = () => {
+    if (currentStep === 1) {
+      if (!formData.name) {
+        toast.error('Please enter your name');
+        return;
+      }
+      if (!formData.email) {
+        toast.error('Please enter your email');
+        return;
+      }
+      if (!formData.phone) {
+        toast.error('Please enter your phone number');
+        return;
+      }
+    }
     setCurrentStep(prev => prev + 1);
   };
 
@@ -52,79 +71,11 @@ export const HeroSection = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
-    
-    try {
-      // Create email content
-      const emailSubject = `New ${selectedType} Application from ${formData.name}`;
-      const emailBody = `
-New Application Details:
-
-Personal Information:
--------------------
-Name: ${formData.name}
-Email: ${formData.email}
-Phone: ${formData.countryCode}${formData.phone}
-
-Application Details:
------------------
-Type: ${selectedType}
-Preferred Country: ${formData.country}
-Interested Program: ${formData.program}
-      `.trim();
-
-      // Create mailto link with pre-filled data
-      const mailtoLink = `mailto:info@globalcircleedu.com?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody)}`;
-
-      // Open email client
-      window.location.href = mailtoLink;
-
-      // Send confirmation email to applicant
-      const confirmationSubject = 'Thank you for your application - Global Circle Edu';
-      const confirmationBody = `
-Dear ${formData.name},
-
-Thank you for your interest in ${selectedType === 'Student' ? 'studying' : 'working'} abroad with Global Circle Edu. We have received your application and our team will review it shortly.
-
-We will contact you within 24-48 hours to discuss your application and guide you through the next steps.
-
-Your Application Details:
-- Type: ${selectedType}
-- Preferred Country: ${formData.country}
-- Interested Program: ${formData.program}
-
-Best regards,
-Global Circle Edu Team
-      `.trim();
-
-      // Open confirmation email in new tab
-      setTimeout(() => {
-        window.open(`mailto:${formData.email}?subject=${encodeURIComponent(confirmationSubject)}&body=${encodeURIComponent(confirmationBody)}`, '_blank');
-      }, 1000);
-
-      toast.success('Application submitted successfully!');
-      
-      // Reset form
-      setCurrentStep(1);
-      setSelectedType('Student'); // Reset to Student
-      setFormData({
-        name: '',
-        email: '',
-        phone: '',
-        countryCode: '+971',
-        country: '',
-        program: ''
-      });
-    } catch (error) {
-      console.error('Error sending email:', error);
-      toast.error('Failed to submit application. Please try again.');
-    } finally {
-      setLoading(false);
-    }
+    setShowJourneyPopup(true);
   };
 
   return (
-    <section className="relative min-h-[85vh] flex items-center">
+    <section className="relative min-h-screen flex items-center">
       <BackgroundSlider currentSlide={currentSlide} onSlideChange={setCurrentSlide} />
 
       {/* Content Container */}
@@ -174,7 +125,7 @@ Global Circle Edu Team
 
               <div className="relative p-4 sm:p-6 md:p-8">
                 <div className="flex justify-between items-center mb-6 sm:mb-8">
-                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
+                  <h2 className="text-xl sm:text-2xl font-bold text-[#004e9a]">
                     Start Your Journey
                   </h2>
                   <div className="flex space-x-2">
@@ -195,6 +146,63 @@ Global Circle Edu Team
 
                 <form onSubmit={handleSubmit} className="space-y-6">
                   {currentStep === 1 && (
+                    <div className="space-y-4">
+                      <div>
+                        <label className="block text-sm font-medium mb-1">Full Name</label>
+                        <div className="relative">
+                          <User className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+                          <input
+                            type="text"
+                            value={formData.name}
+                            onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                            className="w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-[#004e9a] focus:border-transparent bg-gray-50/50"
+                            placeholder="Enter your full name"
+                            required
+                          />
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium mb-1">Email Address</label>
+                        <div className="relative">
+                          <Mail className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+                          <input
+                            type="email"
+                            value={formData.email}
+                            onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
+                            className="w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-[#004e9a] focus:border-transparent bg-gray-50/50"
+                            placeholder="Enter your email"
+                            required
+                          />
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium mb-1">Phone Number</label>
+                        <div className="flex gap-3">
+                          <div className="w-32">
+                            <CountryCodeSelect
+                              value={formData.countryCode}
+                              onChange={(value) => setFormData(prev => ({ ...prev, countryCode: value }))}
+                            />
+                          </div>
+                          <div className="relative flex-1">
+                            <Phone className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+                            <input
+                              type="tel"
+                              value={formData.phone}
+                              onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
+                              className="w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-[#004e9a] focus:border-transparent bg-gray-50/50"
+                              placeholder="Enter phone number"
+                              required
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {currentStep === 2 && (
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <button
                         type="button"
@@ -250,68 +258,12 @@ Global Circle Edu Team
                     </div>
                   )}
 
-                  {currentStep === 2 && (
-                    <div className="space-y-4">
-                      <div className="relative">
-                        <label className="block text-sm font-medium mb-1">Full Name</label>
-                        <div className="relative">
-                          <input
-                            type="text"
-                            value={formData.name}
-                            onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                            className="w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-[#004e9a] focus:border-transparent bg-gray-50/50"
-                            placeholder="Enter your full name"
-                            required
-                          />
-                          <GraduationCap className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
-                        </div>
-                      </div>
-
-                      <div className="relative">
-                        <label className="block text-sm font-medium mb-1">Email Address</label>
-                        <div className="relative">
-                          <input
-                            type="email"
-                            value={formData.email}
-                            onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-                            className="w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-[#004e9a] focus:border-transparent bg-gray-50/50"
-                            placeholder="Enter your email"
-                            required
-                          />
-                          <Mail className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
-                        </div>
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium mb-1">Phone Number</label>
-                        <div className="flex gap-3">
-                          <div className="w-32">
-                            <CountryCodeSelect
-                              value={formData.countryCode}
-                              onChange={(value) => setFormData(prev => ({ ...prev, countryCode: value }))}
-                            />
-                          </div>
-                          <div className="relative flex-1">
-                            <input
-                              type="tel"
-                              value={formData.phone}
-                              onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
-                              className="w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-[#004e9a] focus:border-transparent bg-gray-50/50"
-                              placeholder="Enter phone number"
-                              required
-                            />
-                            <Phone className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
                   {currentStep === 3 && (
                     <div className="space-y-4">
-                      <div className="relative">
+                      <div>
                         <label className="block text-sm font-medium mb-1">Preferred Country</label>
                         <div className="relative">
+                          <MapPin className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
                           <select
                             value={formData.country}
                             onChange={(e) => setFormData(prev => ({ ...prev, country: e.target.value }))}
@@ -325,15 +277,15 @@ Global Circle Edu Team
                               </option>
                             ))}
                           </select>
-                          <MapPin className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
                         </div>
                       </div>
 
-                      <div className="relative">
+                      <div>
                         <label className="block text-sm font-medium mb-1">
                           {selectedType === 'Student' ? 'Interested Program' : 'Job Category'}
                         </label>
                         <div className="relative">
+                          <BookOpen className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
                           <input
                             type="text"
                             value={formData.program}
@@ -342,7 +294,6 @@ Global Circle Edu Team
                             placeholder={selectedType === 'Student' ? 'Enter program name' : 'Enter job category'}
                             required
                           />
-                          <BookOpen className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
                         </div>
                       </div>
 
@@ -364,9 +315,7 @@ Global Circle Edu Team
                         type="button"
                         onClick={handleBack}
                         variant="outline"
-                        className="flex items-center"
                       >
-                        <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5 mr-1 sm:mr-2" />
                         Back
                       </Button>
                     )}
@@ -374,7 +323,7 @@ Global Circle Edu Team
                       <Button
                         type="button"
                         onClick={handleNext}
-                        className={`ml-auto flex items-center ${
+                        className={`ml-auto ${
                           selectedType === 'Student' 
                             ? 'bg-gradient-to-r from-[#004e9a] to-[#004e9a]/80' 
                             : 'bg-gradient-to-r from-[#f37021] to-[#f37021]/80'
@@ -391,6 +340,11 @@ Global Circle Edu Team
           </div>
         </div>
       </div>
+
+      {/* Journey Popup */}
+      {showJourneyPopup && (
+        <JourneyPopup onClose={() => setShowJourneyPopup(false)} />
+      )}
     </section>
   );
 };

@@ -146,16 +146,5 @@ export const locations: MapLocation[] = [
       courses: 200,
       jobs: 600
     }
-  },
-  {
-    id: 'bangladesh',
-    name: 'Bangladesh',
-    coordinates: [690, 210],
-    stats: {
-      universities: 120,
-      students: 35000,
-      courses: 400,
-      jobs: 1200
-    }
   }
 ];

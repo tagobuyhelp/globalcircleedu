@@ -3,7 +3,7 @@ import type { Country } from './types';
 export const slovakia: Country = {
   name: 'Slovakia',
   description: 'Experience quality education in the heart of Europe with affordable tuition fees, rich cultural heritage, and strong emphasis on science and technology, all while enjoying a high standard of living at reasonable costs.',
-  image: 'https://images.unsplash.com/photo-1589385973461-eaa7aa35b024?auto=format&fit=crop&q=80&w=2000',
+  image: 'https://res.cloudinary.com/dttifrbaa/image/upload/v1741617968/GCE/cpqrlevk1dt8avmk4jxm.jpg',
   stats: {
     universities: '35+',
     students: '15,000+',

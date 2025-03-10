@@ -3,17 +3,19 @@ import { Link, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../../store/authStore';
 import { 
   Menu, Home, Briefcase, Newspaper, Settings,
-  Globe
+  Globe, ChevronDown, ChevronRight
 } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { Logo } from '../ui/Logo';
 import { MobileMenu } from './MobileMenu';
+import { cn } from '../../utils/cn';
 
 export const Navbar = () => {
   const location = useLocation();
   const { isAuthenticated, user, logout } = useAuthStore();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isCountriesMenuOpen, setIsCountriesMenuOpen] = useState(false);
+  const [isCountriesHovered, setIsCountriesHovered] = useState(false);
 
   const navItems = [
     { label: 'Home', path: '/', icon: Home },
@@ -80,27 +82,32 @@ export const Navbar = () => {
               const Icon = item.icon;
               if (item.children) {
                 return (
-                  <div key={item.label} className="relative">
+                  <div 
+                    key={item.label} 
+                    className="relative"
+                    onMouseEnter={() => setIsCountriesHovered(true)}
+                    onMouseLeave={() => setIsCountriesHovered(false)}
+                  >
                     <button
-                      className={`px-3 py-2 rounded-md text-sm font-medium flex items-center space-x-2 ${
-                        isCountriesMenuOpen
-                          ? 'text-[#004e9a] bg-blue-50 dark:bg-blue-900/20 dark:text-blue-400'
-                          : 'text-gray-600 hover:text-[#004e9a] dark:text-gray-300 dark:hover:text-blue-400'
-                      }`}
-                      onClick={() => setIsCountriesMenuOpen(!isCountriesMenuOpen)}
+                      className={cn(
+                        "px-3 py-2 rounded-md text-sm font-medium flex items-center space-x-2",
+                        isCountriesHovered
+                          ? "text-[#004e9a] bg-blue-50 dark:bg-blue-900/20 dark:text-blue-400"
+                          : "text-gray-600 hover:text-[#004e9a] dark:text-gray-300 dark:hover:text-blue-400"
+                      )}
                     >
                       <Icon className="h-4 w-4" />
                       <span>{item.label}</span>
+                      <ChevronDown className="h-4 w-4 ml-1" />
                     </button>
-                    {isCountriesMenuOpen && (
-                      <div className="absolute left-0 mt-2 w-64 rounded-md shadow-lg bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5">
-                        <div className="py-1 max-h-[70vh] overflow-y-auto" role="menu">
+                    {isCountriesHovered && (
+                      <div className="absolute left-0 mt-1 w-64 bg-white dark:bg-gray-800 rounded-md shadow-lg ring-1 ring-black ring-opacity-5">
+                        <div className="py-1 max-h-[70vh] overflow-y-auto">
                           {item.children.map((child) => (
                             <Link
                               key={child.path}
                               to={child.path}
                               className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
-                              onClick={() => setIsCountriesMenuOpen(false)}
                             >
                               {child.label}
                             </Link>
@@ -115,11 +122,12 @@ export const Navbar = () => {
                 <Link
                   key={item.path}
                   to={item.path}
-                  className={`px-3 py-2 rounded-md text-sm font-medium flex items-center space-x-2 ${
+                  className={cn(
+                    "px-3 py-2 rounded-md text-sm font-medium flex items-center space-x-2",
                     isActive(item.path)
-                      ? 'text-[#004e9a] bg-blue-50 dark:bg-blue-900/20 dark:text-blue-400'
-                      : 'text-gray-600 hover:text-[#004e9a] dark:text-gray-300 dark:hover:text-blue-400'
-                  }`}
+                      ? "text-[#004e9a] bg-blue-50 dark:bg-blue-900/20 dark:text-blue-400"
+                      : "text-gray-600 hover:text-[#004e9a] dark:text-gray-300 dark:hover:text-blue-400"
+                  )}
                 >
                   <Icon className="h-4 w-4" />
                   <span>{item.label}</span>
@@ -149,7 +157,7 @@ export const Navbar = () => {
             )}
           </div>
 
-          {/* Mobile menu button - Updated with background color */}
+          {/* Mobile menu button */}
           <div className="md:hidden flex items-center">
             <button
               onClick={() => setIsMobileMenuOpen(true)}

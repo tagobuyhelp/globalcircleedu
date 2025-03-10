@@ -3,7 +3,7 @@ import type { Country } from './types';
 export const norway: Country = {
   name: 'Norway',
   description: 'Experience world-class education in one of the world\'s most advanced countries, offering high-quality programs, stunning nature, and excellent quality of life with many English-taught programs.',
-  image: 'https://images.unsplash.com/photo-1513519245088-0e12902e5a38?auto=format&fit=crop&q=80&w=2000',
+  image: 'https://res.cloudinary.com/dttifrbaa/image/upload/v1741617640/2022-07-13_eqvzlk.jpg',
   stats: {
     universities: '40+',
     students: '18,000+',

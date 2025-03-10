@@ -1,13 +1,15 @@
 import React from 'react';
-import { GraduationCap } from 'lucide-react';
 import { SocialLinks } from './SocialLinks';
 
 export const CompanyInfo = () => {
   return (
     <div className="space-y-6">
-      <div className="flex items-center space-x-2">
-        <GraduationCap className="h-8 w-8 text-[#f37021]" />
-        <span className="text-2xl font-bold">Global Circle Edu</span>
+      <div>
+        <img 
+          src="/logo.png" 
+          alt="Global Circle Edu" 
+          className="h-12 w-auto"
+        />
       </div>
       
       <p className="text-gray-300 leading-relaxed">

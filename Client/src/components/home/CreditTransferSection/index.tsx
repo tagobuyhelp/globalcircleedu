@@ -227,8 +227,8 @@ export const CreditTransferSection = () => {
         </div>
 
         {/* CTA Section */}
-        <div className="relative overflow-hidden bg-gradient-to-r from-[#004e9a] via-[#f37021] to-[#faa61a] rounded-2xl p-12 text-white">
-          <div className="absolute inset-0 bg-grid-white/[0.2] animate-[pulse_4s_ease-in-out_infinite]" />
+        <div className="relative overflow-hidden bg-[#004e9a] rounded-2xl p-12 text-white">
+          <div className="absolute inset-0 bg-grid-white/[0.2]" />
           <div className="relative text-center">
             <h3 className="text-3xl font-bold mb-4">
               Ready to Transfer Your Credits?

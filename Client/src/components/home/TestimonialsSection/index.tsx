@@ -2,24 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { TestimonialCard } from './TestimonialCard';
 
-const testimonialSlides = [
-  {
-    title: "Student Success Stories",
-    subtitle: "Hear from Our Students",
-    description: "Discover how our students achieved their dreams of studying abroad"
-  },
-  {
-    title: "Professional Achievements",
-    subtitle: "Career Transformations",
-    description: "Learn about the successful career journeys of our alumni"
-  },
-  {
-    title: "Global Impact",
-    subtitle: "Making a Difference",
-    description: "See how our community is creating positive change worldwide"
-  }
-];
-
 const testimonials = [
   {
     name: "Dr. Sannidhya Acharyya",
@@ -70,7 +52,6 @@ const testimonials = [
 
 export const TestimonialsSection = () => {
   const [activeIndex, setActiveIndex] = useState(0);
-  const [currentSlide, setCurrentSlide] = useState(0);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
 
   useEffect(() => {
@@ -79,7 +60,6 @@ export const TestimonialsSection = () => {
     if (isAutoPlaying) {
       interval = setInterval(() => {
         setActiveIndex((current) => (current + 1) % testimonials.length);
-        setCurrentSlide((current) => (current + 1) % testimonialSlides.length);
       }, 5000);
     }
 
@@ -91,15 +71,11 @@ export const TestimonialsSection = () => {
     setActiveIndex((current) => 
       current === 0 ? testimonials.length - 1 : current - 1
     );
-    setCurrentSlide((current) =>
-      current === 0 ? testimonialSlides.length - 1 : current - 1
-    );
   };
 
   const handleNext = () => {
     setIsAutoPlaying(false);
     setActiveIndex((current) => (current + 1) % testimonials.length);
-    setCurrentSlide((current) => (current + 1) % testimonialSlides.length);
   };
 
   return (
@@ -117,47 +93,15 @@ export const TestimonialsSection = () => {
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
-          <div className="relative h-32">
-            {testimonialSlides.map((slide, index) => (
-              <div
-                key={index}
-                className={`absolute inset-0 transition-all duration-500 transform ${
-                  index === currentSlide 
-                    ? 'opacity-100 translate-y-0' 
-                    : 'opacity-0 translate-y-4'
-                }`}
-              >
-                <h2 className="text-3xl font-bold mb-4 text-white">
-                  {slide.title}
-                  <span className="block text-[#f37021] text-2xl mt-2">
-                    {slide.subtitle}
-                  </span>
-                </h2>
-                <p className="text-lg text-gray-300 max-w-2xl mx-auto">
-                  {slide.description}
-                </p>
-              </div>
-            ))}
-          </div>
-
-          {/* Slide Indicators */}
-          <div className="flex justify-center space-x-2 mt-4">
-            {testimonialSlides.map((_, index) => (
-              <button
-                key={index}
-                onClick={() => {
-                  setCurrentSlide(index);
-                  setIsAutoPlaying(false);
-                }}
-                className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                  index === currentSlide 
-                    ? 'w-8 bg-[#f37021]' 
-                    : 'bg-white/50'
-                }`}
-                aria-label={`Go to slide ${index + 1}`}
-              />
-            ))}
-          </div>
+          <h2 className="text-3xl font-bold mb-4 text-white">
+            Student Success Stories
+            <span className="block text-[#f37021] text-2xl mt-2">
+              Hear from Our Students
+            </span>
+          </h2>
+          <p className="text-lg text-gray-300 max-w-2xl mx-auto">
+            Discover how our students achieved their dreams of studying abroad
+          </p>
         </div>
 
         <div className="relative">
