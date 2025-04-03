@@ -1,23 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { 
-  ArrowRight, Building2, MapPin, Calendar, Globe2, 
-  CheckCircle, Plus, Mail, Phone, User, BookOpen
+  ArrowRight, FileCheck, Clock, DollarSign, 
+  Mail, Phone, User, MapPin, BookOpen,
+  Building2, Globe2, Users, GraduationCap,
+  CheckCircle, Plus
 } from 'lucide-react';
 import { Button } from '../../ui/Button';
 import { Card } from '../../ui/Card';
-import { countries } from '../../../data/studyDestinations';
 import { CountryCodeSelect } from '../../ui/CountryCodeSelect';
+import { countries } from '../../../data/studyDestinations';
 import toast from 'react-hot-toast';
 
-// Define regions and their countries
+// Define regions and ensure each country appears only in one region
 const regions = {
-  'Western Europe': ['France', 'Spain', 'Portugal', 'Ireland', 'Italy', 'Norway'],
-  'Central Europe': ['Czech Republic', 'Poland', 'Slovenia', 'Slovakia', 'Bosnia and Herzegovina'],
-  'Northern Europe': ['Sweden', 'Denmark', 'Latvia', 'Lithuania', 'Estonia'],
+  'Western Europe': ['France', 'Spain', 'Portugal', 'Ireland', 'Italy', 'Norway', 'Finland'],
+  'Central Europe': ['Poland', 'Slovenia', 'Slovakia', 'Bosnia and Herzegovina'],
+  'Northern Europe': ['Sweden', 'Denmark', 'Latvia', 'Lithuania', 'Estonia', 'Czech Republic'],
   'Southern Europe': ['Greece', 'Croatia', 'Malta', 'Cyprus'],
   'Eastern Europe': ['Belarus', 'Georgia'],
-  'Other Regions': ['Australia', 'United Arab Emirates']
+  'Other Regions': ['Australia', 'Canada', 'United Arab Emirates']
 };
 
 export const StudyDestinationsSection = () => {
@@ -141,7 +143,7 @@ Global Circle Edu Team
   };
 
   return (
-    <section className="py-12 sm:py-20 bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
+    <section className="py-16 bg-gray-50 dark:bg-gray-900">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
           <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
@@ -157,9 +159,9 @@ Global Circle Edu Team
           <div className="col-span-12 lg:hidden">
             <div className="overflow-x-auto scrollbar-hide -mx-4 px-4">
               <div className="flex space-x-2 pb-4">
-                {countries.map((country) => (
+                {countries.map((country, index) => (
                   <button
-                    key={country.name}
+                    key={`mobile-country-${index}-${country.name}`}
                     onClick={() => handleCountrySelect(country)}
                     className={`flex items-center whitespace-nowrap px-3 py-2 rounded-full transition-colors ${
                       selectedCountry.name === country.name
@@ -176,18 +178,18 @@ Global Circle Edu Team
 
           {/* Desktop Country List */}
           <div className="hidden lg:block lg:col-span-4 space-y-2 pr-4 border-r dark:border-gray-700 max-h-[600px] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600">
-            {Object.entries(regions).map(([region, countryList]) => (
-              <div key={region} className="mb-6">
+            {Object.entries(regions).map(([region, countryList], regionIndex) => (
+              <div key={`region-${regionIndex}-${region}`} className="mb-6">
                 <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 mb-2 uppercase tracking-wider">
                   {region}
                 </h3>
-                {countryList.map((countryName) => {
+                {countryList.map((countryName, countryIndex) => {
                   const country = countries.find(c => c.name === countryName);
                   if (!country) return null;
                   
                   return (
                     <button
-                      key={country.name}
+                      key={`region-${regionIndex}-country-${countryIndex}-${countryName}`}
                       onClick={() => handleCountrySelect(country)}
                       className={`w-full text-left p-3 sm:p-4 rounded-lg transition-all duration-300 ${
                         selectedCountry.name === country.name
@@ -236,7 +238,7 @@ Global Circle Edu Team
                   <h4 className="font-medium mb-2">Key Features:</h4>
                   <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     {selectedCountry.features.map((feature, index) => (
-                      <li key={index} className="flex items-center space-x-2">
+                      <li key={`${selectedCountry.name}-feature-${index}`} className="flex items-center space-x-2">
                         <div className="w-8 h-8 rounded-full bg-[#004e9a]/10 flex items-center justify-center flex-shrink-0">
                           <CheckCircle className="w-4 h-4 text-[#004e9a]" />
                         </div>

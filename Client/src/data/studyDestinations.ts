@@ -22,6 +22,8 @@ import { australia } from './countries/australia';
 import { uae } from './countries/uae';
 import { bosnia } from './countries/bosnia';
 import { slovakia } from './countries/slovakia';
+import { canada } from './countries/canada';
+import { finland } from './countries/finland';
 
 export const countries = [
   france,
@@ -47,7 +49,9 @@ export const countries = [
   australia,
   uae,
   bosnia,
-  slovakia
+  slovakia,
+  canada,
+  finland
 ];
 
 export * from './countries/types';

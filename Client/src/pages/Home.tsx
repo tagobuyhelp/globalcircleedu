@@ -2,7 +2,6 @@ import React from 'react';
 import { Helmet } from 'react-helmet-async';
 import { HomeLayout } from '../components/layout/HomeLayout';
 import { HeroSection } from '../components/home/HeroSection';
-import { FeaturedSection } from '../components/home/FeaturedSection';
 import { ServicesSection } from '../components/home/ServicesSection';
 import { TestimonialsSection } from '../components/home/TestimonialsSection';
 import { GlobalPresenceSection } from '../components/home/GlobalPresenceSection';
@@ -21,7 +20,6 @@ export const Home = () => {
       <main>
         <HeroSection />
         <DegreePrograms />
-        <FeaturedSection />
         <ServicesSection />
         <CreditTransferSection />
         <StudyDestinationsSection />

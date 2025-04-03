@@ -31,13 +31,14 @@ export const Navbar = () => {
         { label: 'Ireland', path: '/study/ireland' },
         { label: 'Italy', path: '/study/italy' },
         { label: 'Norway', path: '/study/norway' },
+        { label: 'Finland', path: '/study/finland' },
         
         // Central Europe
-        { label: 'Czech Republic', path: '/study/czech' },
+        { label: 'Czech Republic', path: '/study/czech%20republic' },
         { label: 'Poland', path: '/study/poland' },
         { label: 'Slovenia', path: '/study/slovenia' },
         { label: 'Slovakia', path: '/study/slovakia' },
-        { label: 'Bosnia and Herzegovina', path: '/study/bosnia' },
+        { label: 'Bosnia and Herzegovina', path: '/study/bosnia%20and%20herzegovina' },
         
         // Northern Europe
         { label: 'Sweden', path: '/study/sweden' },
@@ -58,6 +59,7 @@ export const Navbar = () => {
         
         // Other Regions
         { label: 'Australia', path: '/study/australia' },
+        { label: 'Canada', path: '/study/canada' },
         { label: 'United Arab Emirates', path: '/study/united%20arab%20emirates' }
       ]
     },
@@ -101,7 +103,7 @@ export const Navbar = () => {
                       <ChevronDown className="h-4 w-4 ml-1" />
                     </button>
                     {isCountriesHovered && (
-                      <div className="absolute left-0 mt-1 w-64 bg-white dark:bg-gray-800 rounded-md shadow-lg ring-1 ring-black ring-opacity-5">
+                      <div className="absolute left-0 mt-0 w-64 bg-white dark:bg-gray-800 rounded-md shadow-lg ring-1 ring-black ring-opacity-5">
                         <div className="py-1 max-h-[70vh] overflow-y-auto">
                           {item.children.map((child) => (
                             <Link
