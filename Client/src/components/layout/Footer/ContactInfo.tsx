@@ -18,8 +18,8 @@ export const ContactInfo = () => {
             <a href="tel:+971555508943" className="block hover:text-[#f37021] transition-colors">
               +971 55 550 8943
             </a>
-            <a href="tel:+917052101786" className="block hover:text-[#f37021] transition-colors">
-              +91 7052 101 786
+            <a href="tel:+918336932235" className="block hover:text-[#f37021] transition-colors">
+              +91 8336932235
             </a>
           </div>
         </div>
