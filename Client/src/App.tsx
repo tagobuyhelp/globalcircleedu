@@ -1,29 +1,31 @@
-import React from 'react';
 import { BrowserRouter } from 'react-router-dom';
-import { AppRoutes } from './routes';
-import { useThemeStore } from './store/themeStore';
-import { AuthProvider } from './providers/AuthProvider';
 import { ChatProvider } from './components/chat/ChatProvider';
-import { Toaster } from 'react-hot-toast';
+import { useThemeStore } from './store/themeStore';
+import { AppRoutes } from './routes';
+import { AuthProvider } from './providers/AuthProvider';
 import { JourneyPopup } from './components/home/JourneyPopup';
+import { Toaster } from 'react-hot-toast';
+import { ErrorBoundary } from './components/ui/ErrorBoundary';
 
 function App() {
   const { isDarkMode } = useThemeStore();
 
   return (
     <>
-      <BrowserRouter>
-        <AuthProvider>
-          <ChatProvider>
-            <div className={isDarkMode ? 'dark' : ''}>
-              <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-                <AppRoutes />
-                <JourneyPopup />
+      <ErrorBoundary>
+        <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+          <AuthProvider>
+            <ChatProvider>
+              <div className={isDarkMode ? 'dark' : ''}>
+                <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+                  <AppRoutes />
+                  <JourneyPopup />
+                </div>
               </div>
-            </div>
-          </ChatProvider>
-        </AuthProvider>
-      </BrowserRouter>
+            </ChatProvider>
+          </AuthProvider>
+        </BrowserRouter>
+      </ErrorBoundary>
       <Toaster position="top-right" />
     </>
   );
