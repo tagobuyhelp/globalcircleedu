@@ -17,7 +17,7 @@ const io = new Server(server, {
 });
 
 // CORS configuration
-const allowedOrigins = ['https://globalcircleedu.com', 'https://devgce.netlify.app', 'https://globalcircleedu.netlify.app', 'https://fascinating-liger-1082c0.netlify.app', 'http://localhost:5173', 'https://fascinating-liger-1082c0.netlify.app'];
+const allowedOrigins = ['https://globalcircleedu.com', 'https://devgce.netlify.app', 'https://globalcircleedu.netlify.app', 'https://fascinating-liger-1082c0.netlify.app', 'http://localhost:5173', 'https://fascinating-liger-1082c0.netlify.app', 'https://education-consultancy-system.tagobuy.site'];
 
 const corsOptions = {
     origin: function (origin, callback) {
