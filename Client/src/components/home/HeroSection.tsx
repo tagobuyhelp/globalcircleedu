@@ -1,14 +1,12 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
 import { 
-  ArrowRight, FileCheck, Clock, DollarSign, 
+  ArrowRight, Clock, DollarSign, 
   Mail, Phone, User, MapPin, BookOpen,
   Building2, Globe2, Users, GraduationCap 
 } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { Card } from '../ui/Card';
 import { CountryCodeSelect } from '../ui/CountryCodeSelect';
-import { useAuthStore } from '../../store/authStore';
 import { BackgroundSlider, slides } from './BackgroundSlider';
 import { JourneyPopup } from './JourneyPopup';
 import { countries } from '../../data/studyDestinations';
@@ -181,15 +179,16 @@ Global Circle Edu Team
   };
 
   return (
-    <section className="relative min-h-screen flex items-center">
+    <section className="relative min-h-[70vh] md:min-h-[75vh] flex items-center">
       <BackgroundSlider currentSlide={currentSlide} onSlideChange={setCurrentSlide} />
 
       {/* Content Container */}
-      <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-20">
-        <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+      <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+        <div className="grid lg:grid-cols-2 gap-6 lg:gap-8 items-center">
           {/* Left Content */}
-          <div className="text-white space-y-6 sm:space-y-8 text-center lg:text-left">
-            <div className="space-y-4 transition-all duration-500 transform">
+          <div className="text-white space-y-4 sm:space-y-6 text-center lg:text-left">
+            <div className="space-y-3 transition-all duration-500 transform">
+              {/* Title */}
               <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold leading-tight">
                 {slides[currentSlide].title}
                 <span className="block text-[#F37021] mt-2">
@@ -199,10 +198,16 @@ Global Circle Edu Team
               <p className="text-lg sm:text-xl text-gray-200 max-w-xl mx-auto lg:mx-0">
                 {slides[currentSlide].description}
               </p>
+              {/* Helpful info row */}
+              <div className="flex items-center justify-center lg:justify-start gap-3 text-xs sm:text-sm text-gray-200">
+                <span className="inline-flex items-center gap-1"><Clock className="w-4 h-4" /> Under 1 minute</span>
+                <span className="opacity-50">•</span>
+                <span className="inline-flex items-center gap-1"><DollarSign className="w-4 h-4" /> Free counselling</span>
+              </div>
             </div>
-            
+
             {/* Quick Stats */}
-            <div className="grid grid-cols-3 gap-3 sm:gap-6 mt-8 sm:mt-12">
+            <div className="grid grid-cols-3 gap-3 sm:gap-4 mt-6 sm:mt-8">
               {stats.map((stat, index) => {
                 const Icon = stat.icon;
                 return (
@@ -229,18 +234,19 @@ Global Circle Edu Team
               <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-[#004e9a]/10 to-[#f37021]/10 rounded-full blur-2xl transform translate-x-16 -translate-y-16" />
               <div className="absolute bottom-0 left-0 w-32 h-32 bg-gradient-to-br from-[#f37021]/10 to-[#004e9a]/10 rounded-full blur-2xl transform -translate-x-16 translate-y-16" />
 
-              <div className="relative p-4 sm:p-6 md:p-8">
-                <div className="flex justify-between items-center mb-6 sm:mb-8">
-                  <h2 className="text-xl sm:text-2xl font-bold text-[#004e9a]">
-                    Start Your Journey
-                  </h2>
+              <div className="relative p-4 sm:p-5 md:p-6">
+                <div className="flex justify-between items-center mb-4 sm:mb-6">
+                  <div>
+                    <h2 className="text-xl sm:text-2xl font-bold text-[#004e9a]">Start Your Journey</h2>
+                    <p className="text-xs text-gray-500 mt-1">3 quick steps: Details → Path → Preferences</p>
+                  </div>
                   <div className="flex space-x-2">
                     {[1, 2, 3].map((step) => (
                       <div
                         key={step}
-                        className={`h-2 rounded-full transition-all duration-300 ${
+                        className={`h-1 rounded-full transition-all duration-300 ${
                           step === currentStep 
-                            ? 'w-8 bg-gradient-to-r from-[#004e9a] to-[#f37021]' 
+                            ? 'w-6 bg-gradient-to-r from-[#004e9a] to-[#f37021]' 
                             : step < currentStep
                             ? 'w-2 bg-[#004e9a]'
                             : 'w-2 bg-gray-200'
@@ -250,9 +256,9 @@ Global Circle Edu Team
                   </div>
                 </div>
 
-                <form onSubmit={handleSubmit} className="space-y-6">
+                <form onSubmit={handleSubmit} className="space-y-5">
                   {currentStep === 1 && (
-                    <div className="space-y-4">
+                    <div className="space-y-3">
                       <div>
                         <label className="block text-sm font-medium mb-1">Full Name</label>
                         <div className="relative">
@@ -266,10 +272,11 @@ Global Circle Edu Team
                             required
                           />
                         </div>
+                        <p className="mt-1 text-xs text-gray-500">As shown on your passport</p>
                       </div>
 
                       <div>
-                        <label className="block text-sm font-medium mb-1">Email Address</label>
+                        <label className="block text-sm font-medium mb-1">Email</label>
                         <div className="relative">
                           <Mail className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
                           <input
@@ -281,11 +288,12 @@ Global Circle Edu Team
                             required
                           />
                         </div>
+                        <p className="mt-1 text-xs text-gray-500">We’ll only use this to contact you about your inquiry</p>
                       </div>
 
                       <div>
                         <label className="block text-sm font-medium mb-1">Phone Number</label>
-                        <div className="flex gap-3">
+                        <div className="flex gap-2 sm:gap-3">
                           <div className="w-32">
                             <CountryCodeSelect
                               value={formData.countryCode}
@@ -304,16 +312,17 @@ Global Circle Edu Team
                             />
                           </div>
                         </div>
+                        <p className="mt-1 text-xs text-gray-500">WhatsApp-enabled number preferred</p>
                       </div>
                     </div>
                   )}
 
                   {currentStep === 2 && (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       <button
                         type="button"
                         onClick={() => setSelectedType('Student')}
-                        className={`relative group overflow-hidden p-6 rounded-xl border-2 transition-all duration-300 ${
+                        className={`relative group overflow-hidden p-4 rounded-xl border-2 transition-all duration-300 ${
                           selectedType === 'Student'
                             ? 'border-[#004e9a] bg-[#004e9a]/5'
                             : 'border-gray-200 hover:border-[#004e9a]/50'
@@ -339,7 +348,7 @@ Global Circle Edu Team
                       <button
                         type="button"
                         onClick={() => setSelectedType('Worker')}
-                        className={`relative group overflow-hidden p-6 rounded-xl border-2 transition-all duration-300 ${
+                        className={`relative group overflow-hidden p-4 rounded-xl border-2 transition-all duration-300 ${
                           selectedType === 'Worker'
                             ? 'border-[#f37021] bg-[#f37021]/5'
                             : 'border-gray-200 hover:border-[#f37021]/50'
@@ -365,7 +374,7 @@ Global Circle Edu Team
                   )}
 
                   {currentStep === 3 && (
-                    <div className="space-y-4">
+                    <div className="space-y-3">
                       <div>
                         <label className="block text-sm font-medium mb-1">Preferred Country</label>
                         <div className="relative">
@@ -415,7 +424,7 @@ Global Circle Edu Team
                   )}
 
                   {/* Navigation Buttons */}
-                  <div className="flex justify-between mt-6 sm:mt-8">
+                  <div className="flex justify-between mt-4 sm:mt-6">
                     {currentStep > 1 && (
                       <Button
                         type="button"
@@ -435,7 +444,7 @@ Global Circle Edu Team
                             : 'bg-gradient-to-r from-[#f37021] to-[#f37021]/80'
                         } group`}
                       >
-                        Next
+                        Continue
                         <ArrowRight className="ml-1 sm:ml-2 w-4 h-4 sm:w-5 sm:h-5 transition-transform group-hover:translate-x-1" />
                       </Button>
                     )}
